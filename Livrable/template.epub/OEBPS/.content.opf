@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+LGPL http://www.gnu.org/licenses/lgpl.html
+© 2013 frederic.glorieux@fictif.org
+© 2014–2015 frederic.glorieux@fictif.org et LABEX OBVIL
+
+
+  Template for an epub package.
+  This allow to declare added resources like css or fonts.
+  Default version, 3.0
+  Comments in this template file will not be copied.
+-->
+<package xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" version="3.0">
+  <!-- required -->
+  <metadata>
+    <!--
+      <dc:publisher>Override on source file</dc:publisher>
+    -->
+    <!-- if inserted fonts
+    <meta property="ibooks:specified-fonts">true</meta>
+    -->
+  </metadata>
+  <!-- required -->
+  <manifest>
+    <item href="Styles/epub.css" id="stylesheet" media-type="text/css"/>
+    <!-- BNF conformance
+    <item id="logogallica" href="logo_gallica.png" media-type="image/png"/>
+    <item id="logobnf" href="bnf.gif" media-type="image/gif"/>
+    -->
+  </manifest>
+  <!-- required -->
+  <spine>
+    <!-- 
+    <itemref idref="apropos"/>
+    -->
+  </spine>
+</package>
