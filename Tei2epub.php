@@ -17,10 +17,10 @@ foreach(array("File", "Web" ) as $class) if (!class_exists($class)) include(dirn
 set_time_limit(-1);
 if (realpath($_SERVER['SCRIPT_FILENAME']) != realpath(__FILE__)); // file is include do nothing
 else if (php_sapi_name() == "cli") {
-  Livrable::cli();
+  Livrable_Tei2epub::cli();
 }
 
-class Livrable {
+class Livrable_Tei2epub {
 
   /** Static parameters, used for example to communicate between XSL tests and calls */
   private static $pars=array();
@@ -115,9 +115,9 @@ class Livrable {
     $dstParts=pathinfo($dstfile);
     // TOTHINK 
     $dstdir=$dstParts['dirname'].'/'.$dstParts['filename'].'-epub/';
-    File::newDir($dstdir);
+    Phips_File::newDir($dstdir);
     // copy the template folder
-    File::copy($template, $dstdir);
+    Phips_File::copy($template, $dstdir);
     // get the content.opf template
     $opf =  $template . 'OEBPS/.content.opf';
     if (file_exists($f = $template . 'OEBPS/content.opf')) $opf = $f;
@@ -146,7 +146,7 @@ class Livrable {
     if (file_exists(self::$pars['srcdir'].self::$pars['bookfilename'].'.png')) $cover=self::$pars['bookfilename'].'.png';
     else if (file_exists(self::$pars['srcdir'].self::$pars['bookfilename'].'.jpg')) $cover=self::$pars['bookfilename'].'.jpg';
     if ($cover) {
-      File::newDir($dstdir.'OEBPS/' . $imagesdir);
+      Phips_File::newDir($dstdir.'OEBPS/' . $imagesdir);
       copy(self::$pars['srcdir'].$cover, $dstdir.'OEBPS/' . $imagesdir . $cover);
     }
     if ($cover) $params['cover'] =  $imagesdir .$cover;
@@ -175,9 +175,9 @@ class Livrable {
     // an empty epub is prepared with the mimetype
     copy(dirname(__FILE__).'/mimetype.epub', $dstfile);
     // zip the dir content
-    File::zip($dstfile, $dstdir);
+    Phips_File::zip($dstfile, $dstdir);
     if (!self::$debug) { // delete tmp dir if not debug
-      File::newDir($dstdir); // this is a strange behaviour, new dir will empty dir
+      Phips_File::newDir($dstdir); // this is a strange behaviour, new dir will empty dir
       rmdir($dstdir);
     }
     // if (self::$logstream) fwrite(self::$logstream, number_format(microtime(true) - $timeStart, 3)." s.\n");
@@ -229,7 +229,7 @@ class Livrable {
     // test first if dst dir (example, epub for sqlite)
     if (isset($dstdir)) {
       // create images folder only if images detected
-      if (!file_exists($dstdir)) File::newDir($dstdir);
+      if (!file_exists($dstdir)) Phips_File::newDir($dstdir);
       // destination
       $i=2;
       // avoid duplicated files
@@ -299,7 +299,7 @@ class Livrable {
     $timeStart = microtime(true);
     array_shift($_SERVER['argv']); // shift first arg, the script filepath
     if (!count($_SERVER['argv'])) exit('
-    usage    : php -f Livrable.php *.xml  dstdir/?
+    usage    : php -f Tei2epub.php *.xml  dstdir/?
 ');
     $dstdir=null;
     $force = false;
@@ -313,11 +313,11 @@ class Livrable {
     }
     if ($dstdir) {
       $dstdir = rtrim($dstdir, '/\\') . '/';
-      if ($force) File::newDir($dstdir); // ?
+      if ($force) Phips_File::newDir($dstdir); // ?
       fwrite(STDERR, "Scan $srcglob, dstdir:$dstdir\n");
     }
     else fwrite(STDERR, "Scan $srcglob\n");
-    File::scanglob($srcglob, function($srcfile) use($dstdir, $force) {
+    Phips_File::scanglob($srcglob, function($srcfile) use($dstdir, $force) {
       $pathinfo=pathinfo($srcfile);
       // if dstdir desired, flatten dstfile
       if ($dstdir) $dstfile = $dstdir.$pathinfo['filename'].'.epub';
@@ -325,7 +325,7 @@ class Livrable {
       if (!$force && file_exists($dstfile) && filemtime($dstfile) > filemtime($srcfile)) return;
       fwrite(STDERR, "$srcfile > $dstfile\n");
       // do something
-      $livre = new Livrable($srcfile);
+      $livre = new Livrable_Tei2epub($srcfile);
       $livre->epub($dstfile);
     });
     fwrite(STDERR, (number_format(microtime(true) - $timeStart, 3))." s.\n");

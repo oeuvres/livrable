@@ -6,14 +6,14 @@ LGPL http://www.gnu.org/licenses/lgpl.html
 
 */
 
-include dirname(__FILE__).'/Livrable.php';
-if (file_exists($dir=dirname(dirname(__FILE__)).'/odt2tei/')) include($dir.'Odt.php');
+include dirname(__FILE__).'/Tei2epub.php';
+if (file_exists($dir=dirname(dirname(__FILE__)).'/Odette/')) include($dir.'Odt2tei.php');
 // Post submit
-$upload = Web::upload();
+$upload = Phips_Web::upload();
 if ($upload) {
   if ($upload['extension'] == 'xml' || $upload['extension'] == 'tei') $teifile = $upload['tmp_name'];
-  else if ($upload['extension'] == 'odt' && class_exists('Odt')) {
-    $odt=new Odt($upload['tmp_name']);
+  else if ($upload['extension'] == 'odt' && class_exists('Odette_Odt2tei')) {
+    $odt=new Odette_Odt2tei($upload['tmp_name']);
     $teifile = dirname($upload['tmp_name']).'/'.$upload['filename'].'.xml';
     $odt->save($teifile, null, array('force'=>true));
     // may copy teifile
@@ -21,7 +21,7 @@ if ($upload) {
   }
   if (isset($_REQUEST['html'])) {
     header ("Content-Type: text/html; charset=UTF-8");
-    $livre = new Livrable($teifile);
+    $livre = new Livrable_Tei2epub($teifile);
     $dom = $livre->transform(dirname(__FILE__) . '/xsl/tei2html.xsl');
     echo $dom->saveXML();
     exit;
@@ -33,7 +33,7 @@ if ($upload) {
     header('Content-Type: application/epub+zip');
     header('Content-Disposition: attachment; filename="'.$upload['filename'].'.epub"');
     header('Content-Description: File Transfer');
-    $livre = new Livrable($teifile);
+    $livre = new Livrable_Tei2epub($teifile);
     $dstfile = $livre->epub(); // return the epub filename created in tmp
     echo file_get_contents($dstfile);
     exit();
@@ -41,7 +41,7 @@ if ($upload) {
 }
   
 $action='index.php';
-$lang = Web::lang();
+$lang = Phips_Web::lang();
 
 
 ?><!DOCTYPE html>
