@@ -19,7 +19,7 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
   
   exclude-result-prefixes="tei opf"
 >
-  <xsl:import href="common.xsl"/>
+  <xsl:import href="../../Transtei/common.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
   <xsl:output encoding="UTF-8" method="xml" indent="yes"/>
