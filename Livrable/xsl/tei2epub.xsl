@@ -20,7 +20,7 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
     exclude-result-prefixes="epub html tei opf"
     extension-element-prefixes=""
   >
-  <xsl:import href="tei2html.xsl"/>
+  <xsl:import href="../../Transtei/tei2html.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
   <xsl:output indent="yes" method="xml" encoding="UTF-8"/>

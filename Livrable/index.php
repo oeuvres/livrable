@@ -22,7 +22,7 @@ if ($upload) {
   if (isset($_REQUEST['html'])) {
     header ("Content-Type: text/html; charset=UTF-8");
     $livre = new Livrable_Tei2epub($teifile);
-    $dom = $livre->transform(dirname(__FILE__) . '/xsl/tei2html.xsl');
+    $dom = $livre->transform(dirname(dirname(__FILE__)) . '/Transtei/tei2html.xsl');
     echo $dom->saveXML();
     exit;
   }
