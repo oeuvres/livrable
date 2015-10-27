@@ -7,6 +7,7 @@ LGPL http://www.gnu.org/licenses/lgpl.html
 */
 
 include dirname(__FILE__).'/Tei2epub.php';
+include dirname(__FILE__).'/Web.php'; // Tothink, better lib 
 if (file_exists($dir=dirname(dirname(__FILE__)).'/Odette/')) include($dir.'Odt2tei.php');
 // Post submit
 $upload = Phips_Web::upload();
@@ -34,8 +35,8 @@ if ($upload) {
     header('Content-Disposition: attachment; filename="'.$upload['filename'].'.epub"');
     header('Content-Description: File Transfer');
     $livre = new Livrable_Tei2epub($teifile);
-    $dstfile = $livre->epub(); // return the epub filename created in tmp
-    echo file_get_contents($dstfile);
+    $destfile = $livre->epub(); // return the epub filename created in tmp
+    echo file_get_contents($destfile);
     exit();
   }
 }
