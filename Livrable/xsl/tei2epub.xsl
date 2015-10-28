@@ -111,16 +111,37 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
       <xsl:with-param name="id">
         <xsl:text>toc</xsl:text>
       </xsl:with-param>
-        <xsl:with-param name="title">
-          <xsl:call-template name="message">
-            <xsl:with-param name="id">toc</xsl:with-param>
-          </xsl:call-template>
-          <xsl:text>, </xsl:text>
-          <xsl:value-of select="$doctitle"/>
-        </xsl:with-param>
-        <xsl:with-param name="content">
-          <xsl:call-template name="toc"/>
-        </xsl:with-param>
+      <xsl:with-param name="title">
+        <xsl:call-template name="message">
+          <xsl:with-param name="id">toc</xsl:with-param>
+        </xsl:call-template>
+        <xsl:text>, </xsl:text>
+        <xsl:value-of select="$doctitle"/>
+      </xsl:with-param>
+      <xsl:with-param name="content">
+        <xsl:choose>
+          <xsl:when test="$format = $epub2">
+            <h1>
+              <xsl:call-template name="message">
+                <xsl:with-param name="id">toc</xsl:with-param>
+              </xsl:call-template>
+            </h1>
+            <xsl:call-template name="toc"/>
+          </xsl:when>
+          <xsl:otherwise>
+             <nav>
+                <xsl:attribute name="epub:type">toc</xsl:attribute>
+                <xsl:attribute name="id">toc</xsl:attribute>
+                <h1>
+                  <xsl:call-template name="message">
+                    <xsl:with-param name="id">toc</xsl:with-param>
+                  </xsl:call-template>
+                </h1>
+                <xsl:call-template name="toc"/>
+             </nav>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:with-param>
     </xsl:call-template>
     <xsl:if test="$fnpage != ''">
       <xsl:variable name="label">
