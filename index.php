@@ -18,13 +18,18 @@ if ($upload) {
     $teifile = dirname($upload['tmp_name']).'/'.$upload['filename'].'.xml';
     $odt->save($teifile, null, array('force'=>true));
     // may copy teifile
-    if (is_dir($dir = dirname(__FILE__).'/tei/')) copy($teifile, $dir.basename($teifile));
+    if (is_dir($dir = dirname(__FILE__).'/tei/') && is_writable($dir)) copy($teifile, $dir.basename($teifile));
   }
   if (isset($_REQUEST['html'])) {
     header ("Content-Type: text/html; charset=UTF-8");
+    echo $dom->saveXML();
+    exit;
+  }
+  else if (isset($_REQUEST['tei'])) {
+    header ("Content-Type: text/xml");
     $livre = new Livrable_Tei2epub($teifile);
     $dom = $livre->transform(dirname(dirname(__FILE__)) . '/Transtei/tei2html.xsl');
-    echo $dom->saveXML();
+    echo file_get_contents($teifile);
     exit;
   }
   else {
@@ -91,13 +96,14 @@ echo '<p>1. Choisissez un de vos fichiers odt ou XML/TEI</p>
 <input type="file" size="70" name="file" accept=".xml,.tei,.odt"/>
 <p>2. Vérifiez l’apparence générale dans une page écran</p>
 <button name="html" onmousedown="changeAction(this.form, \'.html\'); " title="Transformation vers HTML" type="submit">HTML</button>
-<p>3. Télécharger le livre électronique (epub)</p>
+<button name="tei" onmousedown="changeAction(this.form, \'.xml\'); " title="Transformation vers TEI" type="submit">XML/TEI</button><p>3. Télécharger le livre électronique (epub)</p>
 <button name="epub" onmousedown="changeAction(this.form, \'.epub\')" title="Transformation vers EPUB" type="submit">EPUB</button>
 ';} else {
 echo '<p>1. Choose one of your odt or XML/TEI file</p>
 <input type="file" size="70" name="file" accept=".xml,.tei,.odt"/>
 <p>2. Check if transformation is correct in a popup page</p>
 <button name="html" onmousedown="changeAction(this.form, \'.html\'); " title="Transform to HTML" type="submit">HTML</button>
+<button name="tei" onmousedown="changeAction(this.form, \'.xml\'); " title="Transform to TEI" type="submit">XML/TEI</button>
 <p>3. Download the electronic book (epub)</p>
 <button name="epub" onmousedown="changeAction(this.form, \'.epub\')" title="Transform to EPUB" type="submit">EPUB</button>
 ';
