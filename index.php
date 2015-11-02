@@ -55,7 +55,6 @@ $lang = Phips_Web::lang();
   <head>
     <meta charset="utf-8"/>
     <link rel="stylesheet" type="text/css" href="http://svn.code.sf.net/p/obvil/code/dynhum/html.css" />
-    <link rel="stylesheet" type="text/css" href="http://svn.code.sf.net/p/obvil/code/theme/obvil.css" />
     <title><?php
 if ($lang=='fr') echo'Livrable';
 else echo 'Livrable'
@@ -115,7 +114,7 @@ if ($lang=='fr') echo '
 <div>
   <ul>
     <li>Pour un livre avec table des matières, utiliser les styles de titres hiérarchiques (Titre 1, Titre 2…)</li>
-    <li>Pour transmettre des métadonnées à votre bibliothèque, ajouter en tête de fichier des paragraphes commençant par une propriété <a href="http://dublincore.org/documents/dces/">Dublin Core</a> :
+    <li>Pour transmettre des métadonnées à votre bibliothèque, avant le premier titre en tout début de fichier, ajouter des paragraphes commençant par une propriété <a href="http://dublincore.org/documents/dces/">Dublin Core</a> :
       <ul>
         <li>title: Titre du livre</li>
         <li>creator: Nom, Prénom (nom d’usage d’abord pour l’ordre alphabétique)</li>
@@ -135,7 +134,7 @@ else echo '
 <div>
   <ul>
     <li>For a table of contents, use hierarchical styles in odt (Title 1, Title 2…)</li>
-    <li>To have metadatas in your epub library, add some paragraphs at the top of your odt file with a <a href="http://dublincore.org/documents/dces/">Dublin Core</a> property :
+    <li>To have metadatas in your epub library, add some paragraphs at the top of your odt file (before the first title) with a <a href="http://dublincore.org/documents/dces/">Dublin Core</a> property :
       <ul>
         <li>title: Title Of Your Book</li>
         <li>creator: Family Name, First Name (in this order for alphabetic sort)</li>
