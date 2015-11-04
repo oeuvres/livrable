@@ -7,7 +7,7 @@ LGPL http://www.gnu.org/licenses/lgpl.html
 */
 
 include dirname(__FILE__).'/Tei2epub.php';
-include dirname(__FILE__).'/Web.php'; // Tothink, better lib 
+include dirname(__FILE__).'/Phips/Web.php';
 if (file_exists($dir=dirname(dirname(__FILE__)).'/Odette/')) include($dir.'Odt2tei.php');
 // Post submit
 $upload = Phips_Web::upload();
@@ -54,7 +54,7 @@ $lang = Phips_Web::lang();
 <html>
   <head>
     <meta charset="utf-8"/>
-    <link rel="stylesheet" type="text/css" href="http://svn.code.sf.net/p/obvil/code/dynhum/html.css" />
+    <link rel="stylesheet" type="text/css" href="http://oeuvres.github.io/jysuis/html.css" />
     <title><?php
 if ($lang=='fr') echo'Livrable';
 else echo 'Livrable'
@@ -62,12 +62,10 @@ else echo 'Livrable'
     </head>
   <body>
     <div id="center">
-      <header id="header">
-        <h1>
-          <a href="../">Développements</a>
-        </h1>
-        <a class="logo" href="http://obvil.paris-sorbonne.fr/developpements/"><img class="logo" src="../theme/img/logo-obvil.png" alt="OBVIL"></a>
-      </header>
+      <?php 
+if (file_exists($f=dirname(__FILE__).'/header.html')) echo file_get_contents($f);
+else if (file_exists($f=dirname(__FILE__).'/header.php')) include($f);
+      ?>
       <div id="contenu">
 
 <?php
@@ -151,6 +149,10 @@ For any bug or feature, <a href="#" onmouseover="if(this.ok)return; this.href=\'
       ';
  
       
+      ?>
+      <?php 
+if (file_exists($f=dirname(__FILE__).'/footer.html')) echo file_get_contents($f);
+else if (file_exists($f=dirname(__FILE__).'/footer.php')) include($f);
       ?>
       </div>
      </div>

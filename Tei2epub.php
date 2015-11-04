@@ -8,7 +8,7 @@ LGPL http://www.gnu.org/licenses/lgpl.html
 */
 
 // include needed dependances
-include_once(dirname(__FILE__).'/File.php');
+include_once(dirname(__FILE__).'/Phips/File.php');
 
 /**
  * Transform TEI in epub
