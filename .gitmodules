@@ -1,0 +1,3 @@
+[submodule "Phips"]
+	path = Phips
+	url = ../Phips.git
