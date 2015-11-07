@@ -20,7 +20,7 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
     exclude-result-prefixes="epub html tei opf"
     extension-element-prefixes=""
   >
-  <xsl:import href="../../Transtei/tei2html.xsl"/>
+  <xsl:import href="../../Teinte/tei2html.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
   <xsl:output indent="yes" method="xml" encoding="UTF-8"/>
@@ -404,7 +404,7 @@ param id allow to override the default mecanism for file name
     </xsl:choose>
   </xsl:template>
     <xsl:template match="tei:speaker/text()">
-    <xsl:value-of select="translate(., $mins, $caps)"/>
+    <xsl:value-of select="translate(., $lc, $uc)"/>
   </xsl:template>
   <!-- epub supposed to be read, no facs things like runing titles -->
   <xsl:template match="tei:fw"/>

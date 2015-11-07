@@ -11,7 +11,7 @@ Epub parameters
   xmlns:tei="http://www.tei-c.org/ns/1.0" 
   exclude-result-prefixes="tei" 
   >
-    <!-- split policy, to share with ncx and opf -->
+  <xsl:param name="cover"/>
   <!-- @type="character" pfff. -->
   <xsl:key name="split" match="
     tei:*[@type][self::tei:div or self::tei:div0 or self::tei:div1 or self::tei:div2 or self::tei:div3][

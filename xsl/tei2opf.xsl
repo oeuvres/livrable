@@ -19,7 +19,7 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
   
   exclude-result-prefixes="tei opf"
 >
-  <xsl:import href="../../Transtei/common.xsl"/>
+  <xsl:import href="../../Teinte/common.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
   <xsl:output encoding="UTF-8" method="xml" indent="yes"/>
@@ -30,29 +30,29 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
   <xsl:variable name="TEI" select="/*"/>
   <!-- process opf template, copy all and sometimes intercept -->
   <xsl:template match="tei:TEI | tei:TEI.2">
-    <xsl:apply-templates select="document($opf)/*" mode="template"/>
+    <xsl:apply-templates select="document($opf)/*" mode="opf:template"/>
   </xsl:template>
-  <xsl:template match="node()|@*" mode="template">
+  <xsl:template match="node()|@*" mode="opf:template">
     <xsl:copy>
-      <xsl:apply-templates select="node()|@*" mode="template"/>
+      <xsl:apply-templates select="node()|@*" mode="opf:template"/>
     </xsl:copy>
   </xsl:template>
-  <xsl:template match="opf:package/text() | opf:metadata/text() | opf:manifest/text() | opf:spine/text()" mode="template"/>
-  <xsl:template match="comment()" mode="template"/>
-  <xsl:template match="opf:package" mode="template">
+  <xsl:template match="opf:package/text() | opf:metadata/text() | opf:manifest/text() | opf:spine/text()" mode="opf:template"/>
+  <xsl:template match="comment()" mode="opf:template"/>
+  <xsl:template match="opf:package" mode="opf:template">
     <package unique-identifier="dcidid" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">
       <xsl:choose>
         <xsl:when test="$format = $epub2">
           <xsl:attribute name="version">2.0</xsl:attribute>
         </xsl:when>
       </xsl:choose>
-      <xsl:apply-templates mode="template"/>
+      <xsl:apply-templates mode="opf:template"/>
     </package>
   </xsl:template>
-  <xsl:template match="opf:metadata" mode="template">
+  <xsl:template match="opf:metadata" mode="opf:template">
     <metadata>
       <dc:format>application/epub+zip</dc:format>
-      <xsl:apply-templates mode="template"/>
+      <xsl:apply-templates mode="opf:template"/>
       <dc:identifier id="dcidid">
         <xsl:value-of select="$identifier"/>
       </dc:identifier>
@@ -93,10 +93,10 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
       </meta>
     </metadata>
   </xsl:template>
-  <xsl:template match="opf:manifest" mode="template">
+  <xsl:template match="opf:manifest" mode="opf:template">
     <manifest>
       <!-- copy style resources -->
-      <xsl:apply-templates mode="template"/>
+      <xsl:apply-templates mode="opf:template"/>
       <!-- @id reconnus par la plupart des bibliothèques epub -->
       <!-- TODO, cover, do something
       <xsl:if test="$cover != ''">
@@ -141,7 +141,7 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
       <item id="ncx" media-type="application/x-dtbncx+xml" href="toc.ncx"/>
     </manifest>
   </xsl:template>
-  <xsl:template match="opf:spine" mode="template">
+  <xsl:template match="opf:spine" mode="opf:template">
     <spine toc="ncx">
       <xsl:if test="$cover != ''">
         <itemref idref="coverhtml"/>
@@ -153,7 +153,8 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
       </xsl:apply-templates>
       <xsl:if test="$fnpage != ''">
         <itemref idref="{$fnpage}"/>
-      </xsl:if>      <xsl:apply-templates mode="template"/>
+      </xsl:if>
+      <xsl:apply-templates mode="opf:template"/>
     </spine>
   </xsl:template>
   <!-- par défaut tout arrêter -->

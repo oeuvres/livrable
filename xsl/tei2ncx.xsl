@@ -18,7 +18,7 @@
     xmlns:exslt="http://exslt.org/common"
     extension-element-prefixes="exslt"
   >
-  <xsl:import href="../../Transtei/common.xsl"/>
+  <xsl:import href="../../Teinte/common.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
   <xsl:output encoding="UTF-8" indent="yes" format-public="-//NISO//DTD ncx 2005-1//EN" format-system="http://www.daisy.org/z3986/2005/ncx-2005-1.dtd"/>
