@@ -23,25 +23,23 @@ else if (php_sapi_name() == "cli") {
 class Livrable_Tei2epub {
 
   /** Static parameters, used for example to communicate between XSL tests and calls */
-  private static $pars=array();
+  private static $_pars=array();
   /** file path of source document, used to resolve relative links accros methods */
-  private $srcfile;
+  private $_srcfile;
   /** Source DOM document for TEI file */
-  private $srcdoc;
-  /** Messages */
-  public $log=array();
-  /** Debug mode, should be static for the xsl callback */
+  private $_srcdoc;
+  /** Log level, should be static for the xsl callback */
   private static $debug;
   /** time counter, should be static for the xsl callback */
-  private static $time;
-  /** A log stream to output events */
-  private static $logstream;
+  private static $_time;
+  /** A logger, maybe a stream or a callable, used by self::log() */
+  private static $_logger;
   /** XSLT transformer */
-  private $trans;
+  private $_trans;
   /** DOM of an XSLT sheet */
-  private $xsl;
+  private $_xsl;
   /** Different predefined sizes for covers  */
-  private static $size=array(
+  private static $_size=array(
     "small"=>array(150,200),
     "medium"=>array(500,700),
   );
@@ -51,28 +49,29 @@ class Livrable_Tei2epub {
   /**
    * Constructor, initialize what is needed
    */
-  public function __construct($srcfile, $pars=array(), $logstream=null) {
-    self::$pars=array_merge(self::$pars, $pars);
+  public function __construct($srcfile, $logger=null, $pars=array()) {
+    if (!is_array($pars)) $pars=array(); 
+    self::$_pars=array_merge(self::$_pars, $pars);
     if (is_a($srcfile, 'DOMDocument')) {
-      $this->srcdoc = $srcfile;
+      $this->_srcdoc = $srcfile;
     }
     else {
       $this->srcfile=$srcfile;
-      self::$pars['srcdir']=dirname($srcfile).'/';
-      self::$pars['filename']=pathinfo($srcfile, PATHINFO_FILENAME);
+      self::$_pars['srcdir'] = dirname($srcfile).'/';
+      self::$_pars['filename'] = pathinfo($srcfile, PATHINFO_FILENAME);
     }
-    self::$time = microtime(true);
-    if ($logstream) self::$logstream=$logstream;
-    $this->xsl = new DOMDocument();
+    self::$_time = microtime(true);
+    self::$_logger=$logger;
+    $this->_xsl = new DOMDocument();
     // inialize an XSLTProcessor
-    $this->trans = new XSLTProcessor();
-    $this->trans->registerPHPFunctions();
+    $this->_trans = new XSLTProcessor();
+    $this->_trans->registerPHPFunctions();
     // allow generation of <xsl:document>
     if (defined('XSL_SECPREFS_NONE')) $prefs = XSL_SECPREFS_NONE;
     else if (defined('XSL_SECPREF_NONE')) $prefs = XSL_SECPREF_NONE;
     else $prefs = 0;
-    if(method_exists($this->trans, 'setSecurityPreferences')) $oldval = $this->trans->setSecurityPreferences( $prefs);
-    else if(method_exists($this->trans, 'setSecurityPrefs')) $oldval = $this->trans->setSecurityPrefs( $prefs);
+    if(method_exists($this->_trans, 'setSecurityPreferences')) $oldval = $this->_trans->setSecurityPreferences( $prefs);
+    else if(method_exists($this->_trans, 'setSecurityPrefs')) $oldval = $this->_trans->setSecurityPrefs( $prefs);
     else ini_set("xsl.security_prefs",  $prefs);
   }
   /**
@@ -81,28 +80,28 @@ class Livrable_Tei2epub {
   public function load() {
     if ($this->srcfile) {
       // for the source doc
-      $this->srcdoc=new DOMDocument("1.0", "UTF-8");
+      $this->_srcdoc=new DOMDocument("1.0", "UTF-8");
       // normalize indentation of XML before all processing
       $xml=file_get_contents($this->srcfile);
       $xml=preg_replace(array('@\r\n@', '@\r@', '@\n[ \t]+@'), array("\n", "\n", "\n"), $xml);
       // $this->doc->recover=true; // no recover, display errors 
-      if(!$this->srcdoc->loadXML($xml, LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NSCLEAN)) {
-         fwrite(self::$logstream, "XML error ".$this->srcfile."\n");
+      if(!$this->_srcdoc->loadXML($xml, LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NSCLEAN)) {
+         self::log("XML error ".$this->srcfile."\n");
          return false;
       }
     }
     // load 
-    $this->srcdoc->preserveWhiteSpace = false;
-    $this->srcdoc->formatOutput = true;
-    if ($this->srcfile) $this->srcdoc->documentURI = realpath($this->srcfile);
+    $this->_srcdoc->preserveWhiteSpace = false;
+    $this->_srcdoc->formatOutput = true;
+    if ($this->srcfile) $this->_srcdoc->documentURI = realpath($this->srcfile);
     // should resolve xinclude
-    $this->srcdoc->xinclude(LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NSCLEAN );
+    $this->_srcdoc->xinclude(LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NSCLEAN );
     
-    if (self::$debug && self::$logstream) fwrite(self::$logstream, 'load '. round(microtime(true) - self::$time, 3)." s.\n");
+    self::log(E_USER_NOTICE, 'load '. round(microtime(true) - self::$_time, 3)." s.");
     // @xml:id may be used as a href path, example images
-    self::$pars['bookname'] = $this->srcdoc->documentElement->getAttributeNS('http://www.w3.org/XML/1998/namespace', 'id');
-    if (!self::$pars['bookname']) self::$pars['bookname'] = self::$pars['filename'];
-    return $this->srcdoc;
+    self::$_pars['bookname'] = $this->_srcdoc->documentElement->getAttributeNS('http://www.w3.org/XML/1998/namespace', 'id');
+    if (!self::$_pars['bookname']) self::$_pars['bookname'] = self::$_pars['filename'];
+    return $this->_srcdoc;
   }
   
   /**
@@ -111,16 +110,15 @@ class Livrable_Tei2epub {
   public function epub($destfile=null, $template=null) {
     if ($destfile);
     // if no destfile and srcfile, build aside srcfile
-    else if (isset(self::$pars['srcdir'])) $destfile=self::$pars['srcdir'].self::$pars['filename'].'.epub';
+    else if (isset(self::$_pars['srcdir'])) $destfile=self::$_pars['srcdir'].self::$_pars['filename'].'.epub';
     // in tmp dir
-    else  if (isset(self::$pars['filename'])) $destfile=sys_get_temp_dir().'/'.self::$pars['filename'].'.epub';
+    else  if (isset(self::$_pars['filename'])) $destfile=sys_get_temp_dir().'/'.self::$_pars['filename'].'.epub';
     // a 
     else $destfile = tempnam(null, 'LIV');
-    // if (self::$logstream && $destfile) fwrite(self::$logstream, $this->srcfile.' -> '.$destfile."\n");
     if(!$template) $template = dirname(__FILE__).'/template.epub/';
     $imagesdir = 'Images/';
     $timeStart = microtime(true);
-    if (!$this->srcdoc) $this->load(); // srcdoc may have been modified before (ex: naked version)
+    if (!$this->_srcdoc) $this->load(); // srcdoc may have been modified before (ex: naked version)
     $destinfo=pathinfo($destfile);
     // TOTHINK 
     $destdir=$destinfo['dirname'].'/'.$destinfo['filename'].'-epub/';
@@ -135,8 +133,8 @@ class Livrable_Tei2epub {
 
     // copy source Dom to local, before modification by images
     // copy referenced images (received modified doc after copy)
-    $doc=$this->images($this->srcdoc, $imagesdir, $destdir.'OEBPS/' . $imagesdir);
-    if (self::$debug && self::$logstream) fwrite(self::$logstream, 'epub, images '. round(microtime(true) - self::$time, 3)." s.\n");
+    $doc=$this->images($this->_srcdoc, $imagesdir, $destdir.'OEBPS/' . $imagesdir);
+    self::log(E_USER_NOTICE, 'epub, images '. round(microtime(true) - self::$_time, 3)." s.\n");
     // create xhtml pages
     $report = self::transform(
       dirname(__FILE__) . '/xsl/tei2epub.xsl', 
@@ -146,18 +144,17 @@ class Livrable_Tei2epub {
         'destdir' => $destdir . 'OEBPS/', 
         '_html' => '.xhtml',
         'opf' => $opf,
-        'debug' => self::$debug,
       )
     );
     // echo $report->saveXML();
     // cover logic, before opf
     $cover=false;
-    if (!isset(self::$pars['srcdir']) || !isset(self::$pars['filename']));
-    else if (file_exists(self::$pars['srcdir'].self::$pars['filename'].'.png')) $cover=self::$pars['filename'].'.png';
-    else if (file_exists(self::$pars['srcdir'].self::$pars['filename'].'.jpg')) $cover=self::$pars['filename'].'.jpg';
+    if (!isset(self::$_pars['srcdir']) || !isset(self::$_pars['filename']));
+    else if (file_exists(self::$_pars['srcdir'].self::$_pars['filename'].'.png')) $cover=self::$_pars['filename'].'.png';
+    else if (file_exists(self::$_pars['srcdir'].self::$_pars['filename'].'.jpg')) $cover=self::$_pars['filename'].'.jpg';
     if ($cover) {
       Phips_File::newDir($destdir.'OEBPS/' . $imagesdir);
-      copy(self::$pars['srcdir'].$cover, $destdir.'OEBPS/' . $imagesdir . $cover);
+      copy(self::$_pars['srcdir'].$cover, $destdir.'OEBPS/' . $imagesdir . $cover);
     }
     if ($cover) $params['cover'] =  $imagesdir .$cover;
     // opf file 
@@ -168,10 +165,10 @@ class Livrable_Tei2epub {
       array(
         '_html' => '.xhtml',
         'opf' => $opf,
-        // 'filename' => self::$pars['filename'],
+        // 'filename' => self::$_pars['filename'],
       )
     );
-    if (self::$debug && self::$logstream) fwrite(self::$logstream, 'epub, opf '. round(microtime(true) - self::$time, 3)." s.\n");
+    self::log(E_USER_NOTICE, 'epub, opf '. round(microtime(true) - self::$_time, 3)." s.");
     /* ncx not needed in epub3 but useful under firefox epubreader */
     self::transform(
       dirname(__FILE__) . '/xsl/tei2ncx.xsl', 
@@ -179,21 +176,19 @@ class Livrable_Tei2epub {
       $destdir.'OEBPS/toc.ncx', 
       array(
         '_html'=>'.xhtml', 
-        // 'filename' => self::$pars['filename'],
+        // 'filename' => self::$_pars['filename'],
       )
     );
-    if (self::$debug && self::$logstream) fwrite(self::$logstream, 'epub, ncx '. round(microtime(true) - self::$time, 3)." s.\n");
-    // if (self::$debug) echo $report->saveXML();
+    self::log(E_USER_NOTICE, 'epub, ncx '. round(microtime(true) - self::$_time, 3)." s.");
     // because PHP zip do not yet allow store without compression (PHP7)
     // an empty epub is prepared with the mimetype
     copy(dirname(__FILE__).'/mimetype.epub', $destfile);
     // zip the dir content
     Phips_File::zip($destfile, $destdir);
-    if (!self::$debug) { // delete tmp dir if not debug
+    if (self::$debug) { // delete tmp dir if not debug
       Phips_File::newDir($destdir); // this is a strange behaviour, new dir will empty dir
       rmdir($destdir);
     }
-    // if (self::$logstream) fwrite(self::$logstream, number_format(microtime(true) - $timeStart, 3)." s.\n");
     // shall we return entire content of the file ?
     return $destfile;
   }
@@ -232,7 +227,7 @@ class Livrable_Tei2epub {
     // test if relative file path
     if (file_exists($test=dirname($this->srcfile).'/'.$src)) $src=$test;
     // vendor specific etc/filename.jpg
-    else if (isset(self::$pars['srcdir']) && file_exists($test=self::$pars['srcdir'].self::$pars['filename'].'/'.substr($src, strpos($src, '/')+1))) $src=$test;
+    else if (isset(self::$_pars['srcdir']) && file_exists($test=self::$_pars['srcdir'].self::$_pars['filename'].'/'.substr($src, strpos($src, '/')+1))) $src=$test;
     // if not file exists, escape and alert (?)
     else if (!file_exists($src)) {
       $this->log("Image not found: ".$src);
@@ -262,47 +257,56 @@ class Livrable_Tei2epub {
    * Transform a doc with the provided xslt
    */
   public function transform($xsl, $doc=null, $dst=null, $pars=array()) {
+    if (!is_array($pars)) $pars=array();
+    if (!isset($pars['debug'])) $pars['debug'] = self::$debug;
     if (!$doc && isset($this)) {
       $this->load();
-      $doc = $this->srcdoc;
+      $doc = $this->_srcdoc;
     }
-    $this->trans->removeParameter('', '_html');
-    $this->xsl->load($xsl);
-    $this->trans->importStyleSheet($this->xsl);
+    $this->_trans->removeParameter('', '_html');
+    $this->_xsl->load($xsl);
+    $this->_trans->importStyleSheet($this->_xsl);
     // transpose params
     if(isset($pars) && count($pars)) {
       foreach ($pars as $key => $value) {
-        $this->trans->setParameter(null, $key, $value);
+        $this->_trans->setParameter(null, $key, $value);
       }
     }
     $ret=true;
     // changing error_handler allow redirection of <xsl:message>, default behavior is output lines to workaround apache timeout
-    $oldError=set_error_handler(array(__CLASS__,"log"), E_WARNING);
+    $oldError=set_error_handler(array(__CLASS__,"log"));
     // one output
-    if ($dst) $this->trans->transformToURI($doc, $dst);
+    if ($dst) $this->_trans->transformToURI($doc, $dst);
     // no dst file, return dom, so that piping can continue
     else {
-      $ret=$this->trans->transformToDoc($doc);
+      $ret=$this->_trans->transformToDoc($doc);
       // will we have problem here ?
       $ret->formatOutput=true;
       $ret->substituteEntities=true;
     }
     restore_error_handler();
     // reset parameters ! or they will kept on next transform
-    if(isset($pars) && count($pars)) foreach ($pars as $key => $value) $this->trans->removeParameter('', $key);
+    if(isset($pars) && count($pars)) foreach ($pars as $key => $value) $this->_trans->removeParameter('', $key);
     return $ret;
   }
   /**
-   * Handle xsl:message as a custom error handler
-   * To avoid Apache time limit, php should output some
-   * bytes during long transformations
+   * Custom error handler
+   * Especially used for xsl:message coming from transform()
+   * To avoid Apache time limit, php could output some bytes during long transformations
    */
   static function log( $errno, $errstr=null, $errfile=null, $errline=null, $errcontext=null) {
-    if($errstr)$message=$errstr;
-    else $message=$errno;
-    $message=preg_replace("/XSLTProcessor::transformToUri[^:]*:/", "", $message);
-    // default is direct output, maybe better should be found when online
-    if (self::$logstream) fwrite(self::$logstream, "\n".$message);
+    $errstr=preg_replace("/XSLTProcessor::transform[^:]*:/", "", $errstr, -1, $count);
+    if ($count) { // is an XSLT error or an XSLT message, reformat here
+      if(strpos($errstr, 'error')!== false) return false;
+      else if ($errno == E_WARNING) $errno = E_USER_WARNING;
+    } 
+    // a debug message in normal mode, do nothing
+    if ($errno == E_USER_NOTICE && !self::$debug) return true;
+    // not a user message, let work default handler
+    else if ($errno != E_USER_ERROR && $errno != E_USER_WARNING ) return false;
+    if (!self::$_logger);
+    else if (is_resource(self::$_logger)) fwrite(self::$_logger, $errstr."\n");
+    else if ( is_string(self::$_logger) && function_exists(self::$_logger)) call_user_func(self::$_logger, $errstr);
   }
 
   /**
@@ -318,7 +322,7 @@ class Livrable_Tei2epub {
     $force = false;
     while ($arg=array_shift($_SERVER['argv'])) {
       if ($arg[0]=='-') $arg=substr($arg,1);
-      if ($arg=="debug") self::$debug=true; // more log info
+      if ($arg=="debug") self::$debug=true ; // more log info
       else if ($arg=="force") $force=true; // force epub generation
       else if (isset($destdir)) break;
       else if (isset($srcglob)) $destdir=$arg;
@@ -338,7 +342,7 @@ class Livrable_Tei2epub {
       if (!$force && file_exists($destfile) && filemtime($destfile) > filemtime($srcfile)) return;
       fwrite(STDERR, "$srcfile > $destfile\n");
       // do something
-      $livre = new Livrable_Tei2epub($srcfile);
+      $livre = new Livrable_Tei2epub($srcfile, STDERR);
       $livre->epub($destfile);
     });
     fwrite(STDERR, (number_format(microtime(true) - $timeStart, 3))." s.\n");
