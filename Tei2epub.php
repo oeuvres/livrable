@@ -232,7 +232,7 @@ class Livrable_Tei2epub {
     // test if relative file path
     if (file_exists($test=dirname($this->srcfile).'/'.$src)) $src=$test;
     // vendor specific etc/filename.jpg
-    else if (file_exists($test=self::$pars['srcdir'].self::$pars['bookname'].'/'.substr($src, strpos($src, '/')+1))) $src=$test;
+    else if (isset(self::$pars['srcdir']) && file_exists($test=self::$pars['srcdir'].self::$pars['filename'].'/'.substr($src, strpos($src, '/')+1))) $src=$test;
     // if not file exists, escape and alert (?)
     else if (!file_exists($src)) {
       $this->log("Image not found: ".$src);
