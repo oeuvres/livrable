@@ -22,7 +22,7 @@ Epub parameters
       contains(@type, 'poem')
     ] 
 | tei:group/tei:text 
-| /tei:TEI/tei:text/tei:*/tei:*[self::tei:div or self::tei:div1 or self::tei:group or self::tei:titlePage]
+| /tei:TEI/tei:text/tei:*/tei:*[self::tei:div or self::tei:div1 or self::tei:group or self::tei:titlePage  or self::tei:castList][normalize-space(.) != '']
   " use="generate-id(.)"/>
   <!-- Name of page where to project inline footnotes -->
   <xsl:param name="fnpage">

@@ -185,7 +185,7 @@ class Livrable_Tei2epub {
     copy(dirname(__FILE__).'/mimetype.epub', $destfile);
     // zip the dir content
     Phips_File::zip($destfile, $destdir);
-    if (self::$debug) { // delete tmp dir if not debug
+    if (!self::$debug) { // delete tmp dir if not debug
       Phips_File::newDir($destdir); // this is a strange behaviour, new dir will empty dir
       rmdir($destdir);
     }
@@ -318,12 +318,14 @@ class Livrable_Tei2epub {
     if (!count($_SERVER['argv'])) exit('
     usage    : php -f Tei2epub.php *.xml  destdir/?
 ');
-    $destdir=null;
+    $destdir = null;
     $force = false;
+    $update = false;
     while ($arg=array_shift($_SERVER['argv'])) {
       if ($arg[0]=='-') $arg=substr($arg,1);
       if ($arg=="debug") self::$debug=true ; // more log info
       else if ($arg=="force") $force=true; // force epub generation
+      else if ($arg=="update") $update=true; // force epub generation
       else if (isset($destdir)) break;
       else if (isset($srcglob)) $destdir=$arg;
       else $srcglob=$arg;
@@ -334,12 +336,12 @@ class Livrable_Tei2epub {
       fwrite(STDERR, "Scan $srcglob, destdir:$destdir\n");
     }
     else fwrite(STDERR, "Scan $srcglob\n");
-    Phips_File::scanglob($srcglob, function($srcfile) use($destdir, $force) {
+    Phips_File::scanglob($srcglob, function($srcfile) use($destdir, $update, $force) {
       $pathinfo=pathinfo($srcfile);
       // if destdir desired, flatten destfile
       if ($destdir) $destfile = $destdir.$pathinfo['filename'].'.epub';
       else $destfile = $pathinfo['dirname'].'/'.$pathinfo['filename'].'.epub';
-      if (!$force && file_exists($destfile) && filemtime($destfile) > filemtime($srcfile)) return;
+      if ($update && file_exists($destfile) && filemtime($destfile) > filemtime($srcfile)) return;
       fwrite(STDERR, "$srcfile > $destfile\n");
       // do something
       $livre = new Livrable_Tei2epub($srcfile, STDERR);
