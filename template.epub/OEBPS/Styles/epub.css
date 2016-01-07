@@ -190,8 +190,8 @@ div.salute, p.salute { margin: 1em 0 1em 4em; text-indent: 0em; font-style: ital
 .signed { margin-top: 1em; margin-bottom: 2em; text-indent: 0; text-align: right; }
 .sp { widows: 2; orphans: 2; }
 .sp p { text-indent: 0; }
-div.speaker, p.speaker { margin-top: 1.2em; margin-bottom: 0; font-weight: normal ; text-indent: 0; text-align: center; font-size: 85%; font-variant: small-caps; }
-.speaker  i, .speaker  em { font-variant: normal; font-size: 90%; }
+div.speaker, p.speaker { margin-top: 1.2em; margin-bottom: 0; font-weight: normal ; text-indent: 0; text-align: center; font-size: 85%; text-transform: uppercase; }
+.speaker  i, .speaker  em { font-variant: normal; text-transform: none; font-size: 90%; }
 span.space { display: inline-block; }
 .stage { font-style: italic; font-variant: normal; font-size: 85%; }
 .stage .i, .stage em, .stage i { font-style: normal; }
@@ -207,16 +207,18 @@ section section .subtitle { font-size: 150%; }
 .title abbr { font-variant: small-caps; }
 .title em,.title i { font-style: normal; }
 i .title, .i .title { font-style: normal; }
-.titlepage { text-align: center; margin-top: 1.5em; }
-.titlepage h1.sub { font-weight: normal; margin-top: 0; padding-top: 0; font-size: 85%; }
-.titlepage .argument { font-style: normal; }
-.titlepage .byline { font-weight: bold; margin-top: 4em; margin-top: 4em; margin-left: auto; margin-right: auto; text-align: center; }
-.titlepage .docAuthor { margin-top: 1em; margin-bottom: 1em; }
-.titlepage figure { border: none; margin-top: 5em; font-weight: normal; }
-.titlepage > .docImprint { font-size: 75%; line-height: 120%; } 
-.titlepage div.rights { font-size: 65%; }
-.titlepage p, .titlepage blockquote, .titlepage .l  { text-align: center; text-indent: 0; margin-left: 0; margin-right: 0; }
-.titlepage p { margin-top: 1em; margin-top: 1em; }
+.titlePage { text-align: center; margin-top: 1.5em; }
+.titlePage h1.sub { font-weight: normal; margin-top: 0; padding-top: 0; font-size: 85%; }
+.titlePage .argument { font-style: normal; margin: 1em auto 1em auto; text-align: center; }
+.titlePage .argument p { margin-left: auto; margin-right: auto; text-align: center; }
+.titlePage .byline { font-weight: bold; margin-top: 4em; margin-top: 4em; margin-left: auto; margin-right: auto; text-align: center; }
+.titlePage .docAuthor { margin-top: 1em; margin-bottom: 1em; }
+.titlePage figure { border: none; margin-top: 5em; font-weight: normal; }
+.titlePage > .docImprint { font-size: 75%; line-height: 120%; } 
+.titlePage div.rights { font-size: 65%; }
+.titlePage p, .titlePage blockquote, .titlePage .l  { text-align: center; text-indent: 0; margin-left: 0; margin-right: 0; }
+.titlePage p { margin-top: 1em; margin-bottom: 1em; }
+.titlePage .docDate { }
 
 .trailer { font-style: italic; text-align: center; text-indent: 0; margin-top: 2em; }
 li.witness { list-style: square; font-size: 90%; }
