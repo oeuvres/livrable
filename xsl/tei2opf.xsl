@@ -77,13 +77,10 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
           <xsl:value-of select="$docdate"/>
         </dc:date>
       </xsl:if>
-      <xsl:if test="$docdate != ''">
-        <dc:date>
-          <xsl:value-of select="$docdate"/>
-        </dc:date>
-      </xsl:if>
       <xsl:if test="$byline != ''">
-        <xsl:value-of select="$byline"/>
+        <dc:creator>
+          <xsl:value-of select="$byline"/>
+        </dc:creator>
       </xsl:if>
       <meta property="rendition:layout">reflowable</meta>
       <meta property="rendition:orientation">auto</meta>

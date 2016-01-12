@@ -70,7 +70,7 @@ fieldset blockquote { margin: 0.5ex 0 0 0; }
 fieldset ul { margin: 0.5ex 0 0 0; }
 figcaption { display: block; font-size: 0.8em; padding: 6px 8px; background: #dddddd; text-align: center; margin-left: auto; margin-right: auto; font-style: italic; }
 figcaption img { float: right; display: block; padding-left: 6px; margin-right: -10px; margin-top: -8px; }
-figure { display: block; position: relative; padding: 6px; background: white; margin: 0; border: solid 1px #888888; text-align: center; margin-left: auto; margin-right: auto; }
+figure { display: block; padding: 6px; background: white; margin: 0; border: solid 1px #888888; text-align: center; margin-left: auto; margin-right: auto; }
 figure.left { float: left; margin: 15px 15px 8px 0; }
 figure.right { float: right; margin: 15px 0 8px 15px; }
 figure img { padding : 6px; max-width:650px;}
@@ -103,7 +103,7 @@ legend { background: #FFF; white-space: normal; font-size: 105%; color: #666; fo
 mark, b.mark, a.mark { background-color: #FFC; font-weight: bold;}
 /* p { orphans: 2; widows: 2; } pb dans .sp */
 pre { white-space: pre; font-family: "Lucida Console", Courier, "MS Courier New", monospace; }
-pre { width: 95%; line-height: 1em; border-left: 1px dotted #808080; padding-left: 10px; overflow: auto; overflow-y: hidden !important; }
+pre { width: 95%; line-height: 1em; border-left: 1px dotted #808080; padding-left: 10px; }
 q { quotes: '' ''; }
 q q { font-style: italic; }
 samp { font-family: inherit; font-style: italic; }
@@ -111,7 +111,7 @@ section { display: block; clear: both; }
 select { padding: 0 0.5ex; }
 small { font-weight: normal; }
 sup, sub { height: 0; line-height: 1.2em; vertical-align: baseline; position: relative; z-index: inherit; font-variant: normal; font-size: 75%; }
-sup{ line-height: 0.6; vertical-align: top}
+sup{ line-height: 0.6em; vertical-align: top}
 textarea { width: 100%; height: 20em; display: block; }
 table a { border: none; }
 table a:hover { border-width: 0; }
@@ -165,8 +165,10 @@ div.l dfn.gloss { display: block; position: absolute; padding: 5px 5px 5px 5px; 
 p dfn.gloss , div.gloss { padding: 5px 5px 5px 5px; border-radius: 10px; line-height: 110%; text-align: left; font-size: small; background-color: #F3F3F3; text-indent: 0; }
 div.l { } /* Kobo, line-height bof */
 div.l.center { padding-left: 0; }
+/*
 .l.part-M { margin-left: 3em; text-indent: 0; padding-left: 0; }
 .l.part-F { margin-left: 6em; text-indent: 0; padding-left: 0;  }
+*/
 .lb { color: grey; font-size: 85%; }
 p.label, div.label { margin: 0.7em 0; line-height: 1.1em; text-align: center; text-indent: 0; orphans: 0; }
 div.lg { margin-top: 0.7em; margin-bottom: 0.7em; }
@@ -263,9 +265,9 @@ p.right { margin-bottom: 1em; }
 div.right { margin-left: 25%; }
 .sb { font-size: 200%; margin: 1em; text-indent: 0; }
 .sc, .smallcaps, .small-caps, .pmaj { font-variant: small-caps; }
-span.sub { vertical-align: bottom; line-height: 0.1; font-size: 0.7em; }
+span.sub { vertical-align: bottom; line-height: 0.1em; font-size: 0.7em; }
 .small { font-size: 70%; }
-.sup { vertical-align: super; line-height: 0.1; font-size: 0.7em; }
+.sup { vertical-align: super; line-height: 0.1em; font-size: 0.7em; }
 h1.sub { font-size: 100%; padding-top:0; }
 .title i  { font-style: normal }
 .todo { border: #F00 solid 1px; background: #FFC; padding: 1ex; }
