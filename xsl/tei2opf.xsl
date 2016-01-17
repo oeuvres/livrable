@@ -10,15 +10,7 @@ LGPL http://www.gnu.org/licenses/lgpl.html
 TODO Adobe page-map (map page number to paper edition)
 http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
 -->
-<xsl:transform version="1.1"  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns="http://www.idpf.org/2007/opf" 
-  xmlns:dc="http://purl.org/dc/elements/1.1/"
-  xmlns:dcterms="http://purl.org/dc/terms/"
-  xmlns:opf="http://www.idpf.org/2007/opf"
-  xmlns:tei="http://www.tei-c.org/ns/1.0"
-  
-  exclude-result-prefixes="tei opf"
->
+<xsl:transform version="1.1" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:opf="http://www.idpf.org/2007/opf" xmlns:tei="http://www.tei-c.org/ns/1.0" exclude-result-prefixes="tei opf">
   <xsl:import href="../../Teinte/common.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
@@ -71,7 +63,7 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
         </xsl:when>
         <!-- ?? fallback value ? -->
       </xsl:choose>
-        <!-- A good date -->
+      <!-- A good date -->
       <xsl:if test="$docdate != ''">
         <dc:date>
           <xsl:value-of select="$docdate"/>
@@ -174,12 +166,27 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
     <xsl:call-template name="item">
       <xsl:with-param name="type" select="$type"/>
     </xsl:call-template>
-  </xsl:template> 
+  </xsl:template>
+  <!-- section container -->
+  <xsl:template match="tei:back | tei:body | tei:front" mode="opf">
+    <xsl:param name="type"/>
+    <xsl:choose>
+      <!-- Sections, blocks will be lost -->
+      <xsl:when test="descendant::*[key('split', generate-id())]">
+        <xsl:apply-templates select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage" mode="opf">
+          <xsl:with-param name="type" select="$type"/>
+        </xsl:apply-templates>
+      </xsl:when>
+      <!-- simple content -->
+      <xsl:when test="tei:p|tei:l|tei:list|tei:argument|tei:table">
+        <xsl:call-template name="item">
+          <xsl:with-param name="type" select="$type"/>
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
   <!-- Sections, split candidates -->
-  <xsl:template match="
-    tei:body | tei:front | tei:back | tei:group |
-    tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 
-" mode="opf">
+  <xsl:template match="tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 | tei:group" mode="opf">
     <xsl:param name="type"/>
     <xsl:choose>
       <xsl:when test="self::tei:front and not(tei:div|tei:div1)"/>
@@ -193,8 +200,8 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
           <xsl:when test="(self::tei:front|self::tei:body|self::tei:back) and not(tei:p|tei:l|tei:list|tei:argument|tei:table)"/>
           <xsl:when test="$cont">
             <xsl:call-template name="item">
-            <xsl:with-param name="type" select="$type"/>
-          </xsl:call-template>
+              <xsl:with-param name="type" select="$type"/>
+            </xsl:call-template>
           </xsl:when>
         </xsl:choose>
         <!-- Process other children -->
@@ -205,11 +212,11 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
       <!-- Should be last level to split -->
       <xsl:otherwise>
         <xsl:if test="not(key('split', generate-id()))">
-          <xsl:message>tei_opf.xsl, <xsl:value-of select="$type"/>, split problem for: <xsl:call-template name="id"/>, <xsl:call-template name="title"></xsl:call-template></xsl:message>
+          <xsl:message>tei_opf.xsl, <xsl:value-of select="$type"/>, split problem for: <xsl:call-template name="id"/>, <xsl:call-template name="title"/></xsl:message>
         </xsl:if>
         <xsl:call-template name="item">
           <xsl:with-param name="type" select="$type"/>
-        </xsl:call-template>    
+        </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -236,7 +243,6 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
   </xsl:template>
   <!-- Retenir les meta obigatoires déjà renseignées -->
   <xsl:template match="tei:sourceDesc/tei:bibl/tei:title " mode="dc"/>
-  
   <!-- default, no output for unknow elements -->
   <xsl:template match="*" mode="dc">
     <xsl:apply-templates mode="dc"/>

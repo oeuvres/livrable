@@ -222,12 +222,22 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  <!-- section container -->
+  <xsl:template match="tei:back | tei:body | tei:front" mode="epub">
+    <xsl:choose>
+      <!-- Sections, blocks will be lost -->
+      <xsl:when test="descendant::*[key('split', generate-id())]">
+        <xsl:apply-templates select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage" mode="epub"/>
+      </xsl:when>
+      <!-- simple content -->
+      <xsl:when test="tei:p|tei:l|tei:list|tei:argument|tei:table">
+        <xsl:call-template name="document"/>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:apply-templates select="tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7" mode="epub"/>
+  </xsl:template> 
   <!-- Sections, candidates for split -->
-  <xsl:template match="
-    tei:back | tei:body |
-    tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 | 
-    tei:front | tei:group
-" mode="epub">
+  <xsl:template match=" tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 | tei:group" mode="epub">
     <xsl:param name="type"/>
     <xsl:choose>
       <!-- there are children to split, so we should do something special with what is before (and also after)
@@ -260,11 +270,10 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
-        <xsl:apply-templates select="*" mode="epub"/>
+        <xsl:apply-templates select="tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7" mode="epub"/>
         <!-- What about content after last section ? -->
       </xsl:when>
-      <xsl:when test="self::tei:front and not(tei:div|tei:div1)"/>
-      <!-- Normalement pas d'enfant à spliter -->
+      <!-- Should be a leave with no children to split -->
       <xsl:otherwise>
         <xsl:if test="not(key('split', generate-id()))">
           <xsl:message>tei2epub.xsl, split problem for: <xsl:call-template name="id"/>, <xsl:call-template name="title"/></xsl:message>
