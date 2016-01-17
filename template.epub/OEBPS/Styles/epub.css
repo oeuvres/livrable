@@ -161,7 +161,7 @@ hr.footnotes { width: 15%; text-align: left; margin-right: auto; margin-left: 0;
 .foreign { font-style: italic; }
 .forename { font-variant: normal; }
 .form { font-weight: bold; }
-div.l dfn.gloss { display: block; position: absolute; padding: 5px 5px 5px 5px; border-radius: 10px; line-height: 110%; text-align: left; float: right; margin-left: 25em; width: 250px; font-size: small; background-color: #F3F3F3; text-indent: 0; }
+div.l dfn.gloss { display: block; padding: 5px 5px 5px 5px; border-radius: 10px; line-height: 110%; text-align: left; float: right; margin-left: 25em; width: 250px; font-size: small; background-color: #F3F3F3; text-indent: 0; }
 p dfn.gloss , div.gloss { padding: 5px 5px 5px 5px; border-radius: 10px; line-height: 110%; text-align: left; font-size: small; background-color: #F3F3F3; text-indent: 0; }
 div.l { } /* Kobo, line-height bof */
 div.l.center { padding-left: 0; }

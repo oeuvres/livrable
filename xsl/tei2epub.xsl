@@ -250,7 +250,8 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
         <!-- take content before sections -->
         <xsl:variable name="before" select="generate-id(tei:group|tei:div|tei:div0|tei:div1|tei:div2|tei:div3|tei:div4|tei:div5|tei:div6)"/>
         <xsl:variable name="cont" select="tei:*[following-sibling::*[generate-id(.)=$before]]"/>
-        <xsl:if test="$cont">
+        <!-- TO synchronize with tei2opf.xsl -->
+        <xsl:if test="(tei:p|tei:l|tei:list|tei:argument|tei:table) and $cont">
           <xsl:call-template name="document">
             <xsl:with-param name="content">
               <div>

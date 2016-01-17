@@ -182,22 +182,25 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
 " mode="opf">
     <xsl:param name="type"/>
     <xsl:choose>
+      <xsl:when test="self::tei:front and not(tei:div|tei:div1)"/>
+      <xsl:when test="self::tei:back and not(tei:div|tei:div1)"/>
       <!-- TODO synchronize with tei_ncx.xsl -->
       <xsl:when test="descendant::*[key('split', generate-id())]">
+        <!-- Is there something signficative before the first div ? -->
+        <!--
         <xsl:variable name="before" select="generate-id(tei:group|tei:div|tei:div1|tei:div2|tei:div3|tei:div4|tei:div5|tei:div6)"/>
         <xsl:variable name="content" select="tei:*[following-sibling::*[generate-id(.)=$before]]"/>
-        <!-- Content before sections, open item -->
-        <xsl:if test="$content">
+        -->
+        <xsl:if test="tei:p|tei:l|tei:list|tei:argument|tei:table">
           <xsl:call-template name="item">
             <xsl:with-param name="type" select="$type"/>
-          </xsl:call-template>    
+          </xsl:call-template>
         </xsl:if>
         <!-- Process other children -->
         <xsl:apply-templates select="*" mode="opf">
           <xsl:with-param name="type" select="$type"/>
         </xsl:apply-templates>
       </xsl:when>
-      <xsl:when test="self::tei:front and not(tei:div|tei:div1)"/>
       <!-- Should be last level to split -->
       <xsl:otherwise>
         <xsl:if test="not(key('split', generate-id()))">
