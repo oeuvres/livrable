@@ -56,7 +56,7 @@ class Livrable_Tei2epub {
       $this->_srcdoc = $srcfile;
     }
     else {
-      $this->srcfile=$srcfile;
+      $this->_srcfile=$srcfile;
       self::$_pars['srcdir'] = dirname($srcfile).'/';
       self::$_pars['filename'] = pathinfo($srcfile, PATHINFO_FILENAME);
     }
@@ -78,22 +78,22 @@ class Livrable_Tei2epub {
    * Load sourceFile
    */
   public function load() {
-    if ($this->srcfile) {
+    if ($this->_srcfile) {
       // for the source doc
       $this->_srcdoc=new DOMDocument("1.0", "UTF-8");
       // normalize indentation of XML before all processing
-      $xml=file_get_contents($this->srcfile);
+      $xml=file_get_contents($this->_srcfile);
       $xml=preg_replace(array('@\r\n@', '@\r@', '@\n[ \t]+@'), array("\n", "\n", "\n"), $xml);
       // $this->doc->recover=true; // no recover, display errors 
       if(!$this->_srcdoc->loadXML($xml, LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NSCLEAN)) {
-         self::log("XML error ".$this->srcfile."\n");
+         self::log("XML error ".$this->_srcfile."\n");
          return false;
       }
     }
     // load 
     $this->_srcdoc->preserveWhiteSpace = false;
     $this->_srcdoc->formatOutput = true;
-    if ($this->srcfile) $this->_srcdoc->documentURI = realpath($this->srcfile);
+    if ($this->_srcfile) $this->_srcdoc->documentURI = realpath($this->_srcfile);
     // should resolve xinclude
     $this->_srcdoc->xinclude(LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NSCLEAN );
     
@@ -225,7 +225,7 @@ class Livrable_Tei2epub {
     if (strpos($src, 'data:image') === 0) return;
     
     // test if relative file path
-    if (file_exists($test=dirname($this->srcfile).'/'.$src)) $src=$test;
+    if (file_exists($test=dirname($this->_srcfile).'/'.$src)) $src=$test;
     // vendor specific etc/filename.jpg
     else if (isset(self::$_pars['srcdir']) && file_exists($test=self::$_pars['srcdir'].self::$_pars['filename'].'/'.substr($src, strpos($src, '/')+1))) $src=$test;
     // if not file exists, escape and alert (?)
