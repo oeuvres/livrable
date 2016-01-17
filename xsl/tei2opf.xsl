@@ -184,18 +184,19 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
     <xsl:choose>
       <xsl:when test="self::tei:front and not(tei:div|tei:div1)"/>
       <xsl:when test="self::tei:back and not(tei:div|tei:div1)"/>
-      <!-- TODO synchronize with tei_ncx.xsl -->
+      <!-- TO synchronize with tei_ncx.xsl -->
       <xsl:when test="descendant::*[key('split', generate-id())]">
         <!-- Is there something signficative before the first div ? -->
-        <!--
         <xsl:variable name="before" select="generate-id(tei:group|tei:div|tei:div1|tei:div2|tei:div3|tei:div4|tei:div5|tei:div6)"/>
-        <xsl:variable name="content" select="tei:*[following-sibling::*[generate-id(.)=$before]]"/>
-        -->
-        <xsl:if test="tei:p|tei:l|tei:list|tei:argument|tei:table">
-          <xsl:call-template name="item">
+        <xsl:variable name="cont" select="tei:*[following-sibling::*[generate-id(.)=$before]]"/>
+        <xsl:choose>
+          <xsl:when test="(self::tei:front|self::tei:body|self::tei:back) and not(tei:p|tei:l|tei:list|tei:argument|tei:table)"/>
+          <xsl:when test="$cont">
+            <xsl:call-template name="item">
             <xsl:with-param name="type" select="$type"/>
           </xsl:call-template>
-        </xsl:if>
+          </xsl:when>
+        </xsl:choose>
         <!-- Process other children -->
         <xsl:apply-templates select="*" mode="opf">
           <xsl:with-param name="type" select="$type"/>

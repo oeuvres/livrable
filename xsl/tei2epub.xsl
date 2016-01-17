@@ -11,15 +11,7 @@ Kindle hacks
 https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
 <p> : no @class, but @align
 -->
-<xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.1"
-    xmlns:tei="http://www.tei-c.org/ns/1.0"
-    xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:html="http://www.w3.org/1999/xhtml"
-    xmlns:epub="http://www.idpf.org/2007/ops"
-    xmlns:opf="http://www.idpf.org/2007/opf"
-    exclude-result-prefixes="epub html tei opf"
-    extension-element-prefixes=""
-  >
+<xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.1" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:opf="http://www.idpf.org/2007/opf" exclude-result-prefixes="epub html tei opf" extension-element-prefixes="">
   <xsl:import href="../../Teinte/tei2html.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
@@ -34,13 +26,11 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
   <xsl:param name="debug"/>
   <!-- name of this xsl (for some tests, when overridind) -->
   <xsl:variable name="this">tei2epub.xsl</xsl:variable>
-
   <xsl:template match="/">
     <report>
       <xsl:apply-templates select="/*/tei:text" mode="epub"/>
     </report>
   </xsl:template>
-
   <!-- default, stop all -->
   <xsl:template match="*" mode="epub"/>
   <!-- cross roots -->
@@ -129,16 +119,16 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
             <xsl:call-template name="toc"/>
           </xsl:when>
           <xsl:otherwise>
-             <nav>
-                <xsl:attribute name="epub:type">toc</xsl:attribute>
-                <xsl:attribute name="id">toc</xsl:attribute>
-                <h1>
-                  <xsl:call-template name="message">
-                    <xsl:with-param name="id">toc</xsl:with-param>
-                  </xsl:call-template>
-                </h1>
-                <xsl:call-template name="toc"/>
-             </nav>
+            <nav>
+              <xsl:attribute name="epub:type">toc</xsl:attribute>
+              <xsl:attribute name="id">toc</xsl:attribute>
+              <h1>
+                <xsl:call-template name="message">
+                  <xsl:with-param name="id">toc</xsl:with-param>
+                </xsl:call-template>
+              </h1>
+              <xsl:call-template name="toc"/>
+            </nav>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:with-param>
@@ -189,7 +179,7 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
             <xsl:when test="$level &lt; 2">h1</xsl:when>
             <xsl:when test="$level &gt; 7">h6</xsl:when>
             <xsl:otherwise>h<xsl:value-of select="$level - 1"/></xsl:otherwise>
-          </xsl:choose>      
+          </xsl:choose>
         </xsl:variable>
         <xsl:variable name="prev" select="preceding-sibling::tei:head"/>
         <!-- ancestors links, perf problems, not clear in interfaces
@@ -223,7 +213,7 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
               <div class="argument">
                 <xsl:for-each select="tei:group|tei:div|tei:div1|tei:div2|tei:div3|tei:div4|tei:div5|tei:div6">
                   <xsl:if test="position() != 1"> — </xsl:if>
-                    <xsl:call-template name="a"/>
+                  <xsl:call-template name="a"/>
                 </xsl:for-each>
               </div>
             </xsl:if>
@@ -232,15 +222,12 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-
-
   <!-- Sections, candidates for split -->
   <xsl:template match="
     tei:back | tei:body |
     tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 | 
     tei:front | tei:group
 " mode="epub">
-
     <xsl:param name="type"/>
     <xsl:choose>
       <!-- there are children to split, so we should do something special with what is before (and also after)
@@ -251,25 +238,28 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
         <xsl:variable name="before" select="generate-id(tei:group|tei:div|tei:div0|tei:div1|tei:div2|tei:div3|tei:div4|tei:div5|tei:div6)"/>
         <xsl:variable name="cont" select="tei:*[following-sibling::*[generate-id(.)=$before]]"/>
         <!-- TO synchronize with tei2opf.xsl -->
-        <xsl:if test="(tei:p|tei:l|tei:list|tei:argument|tei:table) and $cont">
-          <xsl:call-template name="document">
-            <xsl:with-param name="content">
-              <div>
-                <xsl:call-template name="atts"/>
-                <xsl:apply-templates select="$cont">
-                  <xsl:with-param name="level" select="1"/>
-                </xsl:apply-templates>
-                <!-- TODO, notes by <pb> -->
-                <xsl:if test="$fnpage = ''">
-                  <xsl:call-template name="footnotes">
-                    <xsl:with-param name="cont" select="$cont"/>
-                    <xsl:with-param name="pb"/>
-                  </xsl:call-template>
-                </xsl:if>
-              </div>
-            </xsl:with-param>
-          </xsl:call-template>
-        </xsl:if>
+        <xsl:choose>
+          <xsl:when test="(self::tei:front|self::tei:body|self::tei:back) and not(tei:p|tei:l|tei:list|tei:argument|tei:table)"/>
+          <xsl:when test="$cont">
+            <xsl:call-template name="document">
+              <xsl:with-param name="content">
+                <div>
+                  <xsl:call-template name="atts"/>
+                  <xsl:apply-templates select="$cont">
+                    <xsl:with-param name="level" select="1"/>
+                  </xsl:apply-templates>
+                  <!-- TODO, notes by <pb> -->
+                  <xsl:if test="$fnpage = ''">
+                    <xsl:call-template name="footnotes">
+                      <xsl:with-param name="cont" select="$cont"/>
+                      <xsl:with-param name="pb"/>
+                    </xsl:call-template>
+                  </xsl:if>
+                </div>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
         <xsl:apply-templates select="*" mode="epub"/>
         <!-- What about content after last section ? -->
       </xsl:when>
@@ -283,7 +273,6 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
   <!-- 
 file creation
 param id allow to override the default mecanism for file name
@@ -326,12 +315,7 @@ param id allow to override the default mecanism for file name
         <xsl:value-of select="$message"/>
       </xsl:message>
     </xsl:if>
-    <xsl:document 
-      href="{$href}" 
-      omit-xml-declaration="no" 
-      encoding="UTF-8" 
-      indent="yes"
-    >
+    <xsl:document href="{$href}" omit-xml-declaration="no" encoding="UTF-8" indent="yes">
       <xsl:choose>
         <xsl:when test="$format = $epub3">
           <xsl:text disable-output-escaping="yes">&lt;!DOCTYPE html></xsl:text>
@@ -404,7 +388,7 @@ param id allow to override the default mecanism for file name
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-    <xsl:template match="tei:speaker/text()">
+  <xsl:template match="tei:speaker/text()">
     <xsl:value-of select="translate(., $lc, $uc)"/>
   </xsl:template>
   <!-- epub supposed to be read, no facs things like runing titles -->
