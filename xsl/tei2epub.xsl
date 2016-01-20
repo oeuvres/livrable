@@ -161,7 +161,9 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
     /tei:TEI/tei:text/tei:front/*[self::tei:argument | self::tei:castList | self::tei:epilogue | self::tei:performance | self::tei:prologue | self::tei:set | self::tei:titlePage]
   | /tei:TEI/tei:text/tei:back/*[self::tei:argument | self::tei:castList | self::tei:epilogue | self::tei:performance | self::tei:prologue | self::tei:set | self::tei:titlePage]
     ">
-    <xsl:call-template name="document"/>
+    <xsl:if test="normalize-space(.) != ''">
+      <xsl:call-template name="document"/>
+    </xsl:if>
   </xsl:template>
   <!-- hierarchical titles <h[1-6]> with hierarchical context -->
   <xsl:template match="tei:head">

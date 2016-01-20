@@ -134,6 +134,7 @@ p.caption { font-weight: bold; }
 .cb, .pb, .ed, small.l, small.l-n { font-weight: normal; font-style: normal; float: right; color: grey; font-size: 65%; margin: 0 0 0 1ex; text-indent: 0; text-decoration: none; border: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
 a.ed, a.pb {}
 small.ed { color: grey; font-size: 90%; }
+ul.castList { list-style: none; }
 .choice { background-color: #EEEEEE }
 h1.collection, h1.collection-sub { font-weight: normal; padding: 0; margin: 0; } 
 h1.collection { text-transform: uppercase; }
@@ -281,7 +282,7 @@ mark a.prev, .mark a.prev { background-color: white }
 mark a.next, .mark a.next { background-color: white }
 
 /* list styles */
-ul.none, ol.none, ul.simple, ol.simple, ol.tree { list-style-type: none; }
+ul.none, ol.none, ul.simple, ol.simple, ol.tree, ol.tree ol, ul.tree, ul.tree ul { list-style-type: none; }
 .dialogue  { list-style-type: none; }
 .circle { list-style-type: circle }
 .decimal { list-style-type: decimal }
