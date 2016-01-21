@@ -158,9 +158,7 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
   </xsl:template>
   <!-- title page and blurb entry -->
   <xsl:template mode="epub" match="
-    /tei:TEI/tei:text/tei:front/*[self::tei:argument | self::tei:castList | self::tei:epilogue | self::tei:performance | self::tei:prologue | self::tei:set | self::tei:titlePage]
-  | /tei:TEI/tei:text/tei:back/*[self::tei:argument | self::tei:castList | self::tei:epilogue | self::tei:performance | self::tei:prologue | self::tei:set | self::tei:titlePage]
-    ">
+    /tei:TEI/tei:text/*[self::tei:front | self::tei:back]/*[self::tei:argument | self::tei:castList | self::tei:epilogue | self::tei:performance | self::tei:prologue | self::tei:set | self::tei:titlePage]">
     <xsl:if test="normalize-space(.) != ''">
       <xsl:call-template name="document"/>
     </xsl:if>
