@@ -5,10 +5,11 @@ LGPL http://www.gnu.org/licenses/lgpl.html
 © 2013–2015 frederic.glorieux@fictif.org et LABEX OBVIL
 
 */
-
+error_reporting(E_ALL);
 include dirname(__FILE__).'/Tei2epub.php';
 include dirname(__FILE__).'/Phips/Web.php';
 if (file_exists($dir=dirname(dirname(__FILE__)).'/Odette/')) include($dir.'Odt2tei.php');
+if (file_exists($dir=dirname(dirname(__FILE__)).'/Teinte/')) include($dir.'Doc.php');
 // Post submit
 $upload = Phips_Web::upload();
 if ($upload) {
@@ -20,15 +21,15 @@ if ($upload) {
     // may copy teifile
     if (is_dir($dir = dirname(__FILE__).'/tei/') && is_writable($dir)) copy($teifile, $dir.basename($teifile));
   }
-  if (isset($_REQUEST['html'])) {
+  // transform upload file in html
+  if (isset($_REQUEST['html']) && class_exists('Teinte_Doc')) {
     header ("Content-Type: text/html; charset=UTF-8");
-    echo $dom->saveXML();
-    exit;
+    $doc=new Teinte_Doc($teifile);
+    echo $doc->html();
+    exit();
   }
   else if (isset($_REQUEST['tei'])) {
     header ("Content-Type: text/xml");
-    $livre = new Livrable_Tei2epub($teifile);
-    $dom = $livre->transform(dirname(dirname(__FILE__)) . '/Transtei/tei2html.xsl');
     echo file_get_contents($teifile);
     exit;
   }
@@ -45,7 +46,7 @@ if ($upload) {
     exit();
   }
 }
-  
+
 $action='index.php';
 $lang = Phips_Web::lang();
 
@@ -54,7 +55,7 @@ $lang = Phips_Web::lang();
 <html>
   <head>
     <meta charset="utf-8"/>
-    <link rel="stylesheet" type="text/css" href="http://oeuvres.github.io/jysuis/html.css" />
+    <link rel="stylesheet" type="text/css" href="http://oeuvres.github.io/Teinte/tei2html.css" />
     <title><?php
 if ($lang=='fr') echo'Livrable';
 else echo 'Livrable'
@@ -62,7 +63,7 @@ else echo 'Livrable'
     </head>
   <body>
     <div id="center">
-      <?php 
+      <?php
 if (file_exists($f=dirname(__FILE__).'/header.html')) echo file_get_contents($f);
 else if (file_exists($f=dirname(__FILE__).'/header.php')) include($f);
       ?>
@@ -70,41 +71,44 @@ else if (file_exists($f=dirname(__FILE__).'/header.php')) include($f);
 
 <?php
 if ($lang=='fr') echo '
-  <span class="bar langBar">[ fr |<a href="?lang=en"> en </a>]</span> 
+  <span class="bar langBar">[ fr |<a href="?lang=en"> en </a>]</span>
   <h1>Livrable, vous livre un livre électronique (epub) à partir d’un fichier traitement de textes stylé (odt) ou XML/TEI</h1>
   <p class="byline">par Frédéric Glorieux</p>
 ';
 else echo '
-  <span class="bar langBar">[ en |<a href="?lang=fr"> fr </a>]</span> 
+  <span class="bar langBar">[ en |<a href="?lang=fr"> fr </a>]</span>
   <h1>Livrable, deliver epub books from Word Processor file with styles (odt) or XML/TEI</h1>
   <p class="byline">by Frédéric Glorieux</p>
 ';
 ?>
+
       <form class="center"
         action="<?php echo $action; ?>"
         enctype="multipart/form-data" method="POST" name="upload" target="_blank"
        >
        <script type="text/javascript">
-function changeAction(form, ext){var filename=form.file.value;var pos=filename.lastIndexOf('.'); if(pos>0) filename=filename.substring(0, pos); form.action='index.php/'+filename+ext; }
+function changeAction(form, ext) { return false;
+  var filename=form.file.value;var pos=filename.lastIndexOf('.'); if(pos>0) filename=filename.substring(0, pos); form.action='index.php/'+filename+ext;
+}
        </script>
         <?php
 if ($lang=='fr') {
-echo '<p>1. Choisissez un de vos fichiers odt ou XML/TEI</p>
-<input type="file" size="70" name="file" accept=".xml,.tei,.odt"/>
+echo '<p>1. Choisissez un de vos fichiers ODT ou TEI</p>
+<input type="file" size="70" name="file" accept="application/vnd.oasis.opendocument.text, text/xml"/>
 <p>2. Vérifiez l’apparence générale dans une page écran</p>
 <button name="html" onmousedown="changeAction(this.form, \'.html\'); " title="Transformation vers HTML" type="submit">HTML</button>
 <button name="tei" onmousedown="changeAction(this.form, \'.xml\'); " title="Transformation vers TEI" type="submit">XML/TEI</button><p>3. Télécharger le livre électronique (epub)</p>
 <button name="epub" onmousedown="changeAction(this.form, \'.epub\')" title="Transformation vers EPUB" type="submit">EPUB</button>
 ';} else {
-echo '<p>1. Choose one of your odt or XML/TEI file</p>
-<input type="file" size="70" name="file" accept=".xml,.tei,.odt"/>
+echo '<p>1. Choose one of your ODT or TEI file</p>
+<input type="file" size="70" name="file" accept="application/vnd.oasis.opendocument.text, text/xml"/>
 <p>2. Check if transformation is correct in a popup page</p>
 <button name="html" onmousedown="changeAction(this.form, \'.html\'); " title="Transform to HTML" type="submit">HTML</button>
 <button name="tei" onmousedown="changeAction(this.form, \'.xml\'); " title="Transform to TEI" type="submit">XML/TEI</button>
 <p>3. Download the electronic book (epub)</p>
 <button name="epub" onmousedown="changeAction(this.form, \'.epub\')" title="Transform to EPUB" type="submit">EPUB</button>
 ';
-}        
+}
         ?>
       </form>
       <?php
@@ -125,7 +129,7 @@ if ($lang=='fr') echo '
       <p>
 Si vous n’êtes pas satisfait, <a href="#" onmouseover="if(this.ok)return; this.href=\'mai\'+\'lt\'+\'o:frederic.glorieux\'+\'\\u0040\'+\'fictif.org\'; this.ok=true">écrivez moi</a>, je serais content de vous satisfaire.
       </p>
-     
+
 </div>
       ';
 else echo '
@@ -147,10 +151,10 @@ For any bug or feature, <a href="#" onmouseover="if(this.ok)return; this.href=\'
       </p>
 </div>
       ';
- 
-      
+
+
       ?>
-      <?php 
+      <?php
 if (file_exists($f=dirname(__FILE__).'/footer.html')) echo file_get_contents($f);
 else if (file_exists($f=dirname(__FILE__).'/footer.php')) include($f);
       ?>
