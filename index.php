@@ -87,7 +87,7 @@ else echo '
         enctype="multipart/form-data" method="POST" name="upload" target="_blank"
        >
        <script type="text/javascript">
-function changeAction(form, ext) { return false;
+function changeAction(form, ext) { 
   var filename=form.file.value;var pos=filename.lastIndexOf('.'); if(pos>0) filename=filename.substring(0, pos); form.action='index.php/'+filename+ext;
 }
        </script>

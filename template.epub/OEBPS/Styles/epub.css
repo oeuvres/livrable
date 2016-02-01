@@ -3,14 +3,14 @@
 LGPL http://www.gnu.org/licenses/lgpl.html
 © 2012–2013 frederic.glorieux@fictif.org
 © 2013–2015 frederic.glorieux@fictif.org et LABEX OBVIL
- 
+
  *
- • (all) — no support for: :empty; display:oeb-page-head, oeb-page-foot; font-family:cursive,fantasy; 
- • FBReader — no CSS support 
+ • (all) — no support for: :empty; display:oeb-page-head, oeb-page-foot; font-family:cursive,fantasy;
+ • FBReader — no CSS support
  • Adobe Digital Editions — italic with @font-face should be separately declared ; CSS hack http://www.mobileread.com/forums/showpost.php?p=744547&postcount=60
  • Sony PRS-350 —
  • FireFox EPUBReader — be careful with font-style:oblique
- • Kindle — fonts: Georgia, Caecilia, Trebuchet, Verdana, Arial, "Times New Roman", Courier, and Lucida. 
+ • Kindle — fonts: Georgia, Caecilia, Trebuchet, Verdana, Arial, "Times New Roman", Courier, and Lucida.
  • IBooks — make it fool (pages lost) body, html {display:block;height:100%; margin:0px; padding:0px; border-width:0px;widows: 0;orphans: 0;page-break-inside:avoid;}
 
 
@@ -65,7 +65,7 @@ dfn { font-style: normal; }
 dl.dl dt { font-weight: 900; }
 dl.dl dd { text-align: justify; color: #333; margin-top: 0em; margin-bottom: 0.5em; }
 fieldset { margin: 2em 0 1em 0; padding: 0 1ex 1ex 1ex; }
-fieldset div { line-height: 1.1em; margin: 0.5ex 0; }
+fieldset div { line-height: 110%; margin: 0.5ex 0; }
 fieldset blockquote { margin: 0.5ex 0 0 0; }
 fieldset ul { margin: 0.5ex 0 0 0; }
 figcaption { display: block; font-size: 0.8em; padding: 6px 8px; background: #dddddd; text-align: center; margin-left: auto; margin-right: auto; font-style: italic; }
@@ -73,7 +73,7 @@ figcaption img { float: right; display: block; padding-left: 6px; margin-right: 
 figure { display: block; padding: 6px; background: white; margin: 0; border: solid 1px #888888; text-align: center; margin-left: auto; margin-right: auto; }
 figure.left { float: left; margin: 15px 15px 8px 0; }
 figure.right { float: right; margin: 15px 0 8px 15px; }
-figure img { padding : 6px; max-width:650px;}
+figure img { padding : 6px; }
 figure a { text-decoration: none; border-bottom: none; }
 figure a:hover { text-decoration: none; border-bottom: none; }
 form label { padding: 0; line-height: 100%; }
@@ -103,15 +103,15 @@ legend { background: #FFF; white-space: normal; font-size: 105%; color: #666; fo
 mark, b.mark, a.mark { background-color: #FFC; font-weight: bold;}
 /* p { orphans: 2; widows: 2; } pb dans .sp */
 pre { white-space: pre; font-family: "Lucida Console", Courier, "MS Courier New", monospace; }
-pre { width: 95%; line-height: 1em; border-left: 1px dotted #808080; padding-left: 10px; }
+pre { width: 95%; line-height: 100%; border-left: 1px dotted #808080; padding-left: 10px; }
 q { quotes: '' ''; }
 q q { font-style: italic; }
 samp { font-family: inherit; font-style: italic; }
 section { display: block; clear: both; }
 select { padding: 0 0.5ex; }
 small { font-weight: normal; }
-sup, sub { height: 0; line-height: 1.2em; vertical-align: baseline; position: relative; z-index: inherit; font-variant: normal; font-size: 75%; }
-sup{ line-height: 0.6em; vertical-align: top}
+sup { line-height: 5%; vertical-align: text-top; font-variant: normal; }
+sub { line-height: 5%; vertical-align: text-bottom; font-variant: normal; }
 textarea { width: 100%; height: 20em; display: block; }
 table a { border: none; }
 table a:hover { border-width: 0; }
@@ -136,7 +136,7 @@ a.ed, a.pb {}
 small.ed { color: grey; font-size: 90%; }
 ul.castList { list-style: none; }
 .choice { background-color: #EEEEEE }
-h1.collection, h1.collection-sub { font-weight: normal; padding: 0; margin: 0; } 
+h1.collection, h1.collection-sub { font-weight: normal; padding: 0; margin: 0; }
 h1.collection { text-transform: uppercase; }
 .dateline { margin: 2em 0; text-indent: 4em; }
 section.div { padding-top: 3em; }
@@ -155,7 +155,7 @@ div.docImprint { text-align: center; }
 .figcaption { font-style: italic; }
 .fileDesc { text-align: center; }
 .fileDesc  > .titleStmt { text-align: center; margin: 0 0 5em 0; line-height: 150%;}
-.fileDesc  > .editionStmt, .fileDesc  > .publicationStmt, .fileDesc  > .sourceDesc { text-align: left; line-height: 1.2em; font-size: 90%; }
+.fileDesc  > .editionStmt, .fileDesc  > .publicationStmt, .fileDesc  > .sourceDesc { text-align: left; line-height: 120%; font-size: 90%; }
 .floatingText { line-height: 120%; padding: 0% 1% 1% 5%; background-color: #F8F7F4; }
 .footnotes { margin-top: 3em; margin-bottom: 1em; }
 hr.footnotes { width: 15%; text-align: left; margin-right: auto; margin-left: 0; }
@@ -171,7 +171,7 @@ div.l.center { padding-left: 0; }
 .l.part-F { margin-left: 6em; text-indent: 0; padding-left: 0;  }
 */
 .lb { color: grey; font-size: 85%; }
-p.label, div.label { margin: 0.7em 0; line-height: 1.1em; text-align: center; text-indent: 0; orphans: 0; }
+p.label, div.label { margin: 0.7em 0; line-height: 110%; text-align: center; text-indent: 0; orphans: 0; }
 div.lg { margin-top: 0.7em; margin-bottom: 0.7em; }
 div.note, aside.note { font-size: 85%; line-height: 115%; margin-top: 1em; text-align: justify; }
 section > div.note { padding: 2px 1ex 2px 1ex; background-color: #DDDDDD; }
@@ -198,7 +198,7 @@ div.speaker, p.speaker { margin-top: 1.2em; margin-bottom: 0; font-weight: norma
 span.space { display: inline-block; }
 .stage { font-style: italic; font-variant: normal; font-size: 85%; }
 .stage .i, .stage em, .stage i { font-style: normal; }
-div.stage { text-align: justify; margin-top: 1ex; margin-bottom: 1ex; line-height: 1.1em; }
+div.stage { text-align: justify; margin-top: 1ex; margin-bottom: 1ex; line-height: 110%; }
 div.stage.sc { font-style: normal; text-align: center; margin-left: auto; margin-right: auto; font-size: 105%; margin-bottom: 1ex; }
 hi.i, h2.sub, h2.i, h3.sub ,h4.sub,h5.sub,h6.sub { font-style: italic; font-weight: normal; border: none; margin-top: 0; padding-top: 0; }
 .scene h2 { font-weight: normal; font-style: italic; }
@@ -217,7 +217,7 @@ i .title, .i .title { font-style: normal; }
 .titlePage .byline { font-weight: bold; margin-top: 4em; margin-top: 4em; margin-left: auto; margin-right: auto; text-align: center; }
 .titlePage .docAuthor { margin-top: 1em; margin-bottom: 1em; }
 .titlePage figure { border: none; margin-top: 5em; font-weight: normal; }
-.titlePage > .docImprint { font-size: 75%; line-height: 120%; } 
+.titlePage > .docImprint { font-size: 75%; line-height: 120%; }
 .titlePage div.rights { font-size: 65%; }
 .titlePage p, .titlePage blockquote, .titlePage .l  { text-align: center; text-indent: 0; margin-left: 0; margin-right: 0; }
 .titlePage p { margin-top: 1em; margin-bottom: 1em; }
@@ -266,9 +266,7 @@ p.right { margin-bottom: 1em; }
 div.right { margin-left: 25%; }
 .sb { font-size: 200%; margin: 1em; text-indent: 0; }
 .sc, .smallcaps, .small-caps, .pmaj { font-variant: small-caps; }
-span.sub { vertical-align: bottom; line-height: 0.1em; font-size: 0.7em; }
 .small { font-size: 70%; }
-.sup { vertical-align: super; line-height: 0.1em; font-size: 0.7em; }
 h1.sub { font-size: 100%; padding-top:0; }
 .title i  { font-style: normal }
 .todo { border: #F00 solid 1px; background: #FFC; padding: 1ex; }
