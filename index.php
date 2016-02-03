@@ -49,13 +49,14 @@ if ($upload) {
 
 $action='index.php';
 $lang = Phips_Web::lang();
-
+$teinte = 'http://oeuvres.github.io/Teinte/';
+// $teinte = '../Teinte/';
 
 ?><!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8"/>
-    <link rel="stylesheet" type="text/css" href="http://oeuvres.github.io/Teinte/tei2html.css" />
+    <link rel="stylesheet" type="text/css" href="<?php echo $teinte; ?>tei2html.css" />
     <title><?php
 if ($lang=='fr') echo'Livrable';
 else echo 'Livrable'
@@ -72,12 +73,14 @@ else if (file_exists($f=dirname(__FILE__).'/header.php')) include($f);
 <?php
 if ($lang=='fr') echo '
   <span class="bar langBar">[ fr |<a href="?lang=en"> en </a>]</span>
-  <h1>Livrable, vous livre un livre électronique (epub) à partir d’un fichier traitement de textes stylé (odt) ou XML/TEI</h1>
+  <h1>Livrable, vous livre un livre électronique (epub) à partir d’un fichier XML/TEI
+  <br/>(ou odt, grâce à <a href="../Odette/">Odette</a>)</h1>
   <p class="byline">par Frédéric Glorieux</p>
 ';
 else echo '
   <span class="bar langBar">[ en |<a href="?lang=fr"> fr </a>]</span>
-  <h1>Livrable, deliver epub books from Word Processor file with styles (odt) or XML/TEI</h1>
+  <h1>Livrable, deliver epub books from XML/TEI
+  <br/>(or odt Word Processor file with styles (odt), with <a href="../Odette/">Odette</a>)</h1>
   <p class="byline">by Frédéric Glorieux</p>
 ';
 ?>
@@ -87,7 +90,7 @@ else echo '
         enctype="multipart/form-data" method="POST" name="upload" target="_blank"
        >
        <script type="text/javascript">
-function changeAction(form, ext) { 
+function changeAction(form, ext) {
   var filename=form.file.value;var pos=filename.lastIndexOf('.'); if(pos>0) filename=filename.substring(0, pos); form.action='index.php/'+filename+ext;
 }
        </script>
@@ -127,7 +130,7 @@ if ($lang=='fr') echo '
   </ul>
 
       <p>
-Si vous n’êtes pas satisfait, <a href="#" onmouseover="if(this.ok)return; this.href=\'mai\'+\'lt\'+\'o:frederic.glorieux\'+\'\\u0040\'+\'fictif.org\'; this.ok=true">écrivez moi</a>, je serais content de vous satisfaire.
+Si vous n’êtes pas satisfait, <a href="#" onmouseover="if(this.ok)return; this.href=\'mai\'+\'lt\'+\'o:frederic.glorieux\'+\'\\u0040\'+\'fictif.org\'; this.ok=true">écrivez moi</a>, je serais content de me corriger.
       </p>
 
 </div>

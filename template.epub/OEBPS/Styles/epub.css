@@ -35,7 +35,7 @@ li { padding-left: 0; margin-left: 0; }
 .dialogue li { text-indent: 0.5em; text-indent: 0.5rem; }
 p { margin: 0; text-align: justify; text-indent: 1.5em; text-indent: 1.5rem; }
 div.l { text-align: left; text-indent: -1.5em; padding-left: 1.5em; text-indent: -1.5rem; padding-left: 1.5rem; }
-.sp div.stage { text-indent: 1.5em; margin-top: 0; margin-bottom: 0; line-height: 110%; text-indent: 1.5rem; }
+.sp div.stage { margin-left: 1.5rem; margin-top: 0.5ex; margin-bottom: 0.5ex; line-height: 120%; }
 
 /* html5 default, in alphabetic order */
 a:target, mark:target, b.mark:target { border-bottom: 3px #CCCCCC solid; background-color: #FFFFEE; border-radius-top-left: 0; }
@@ -192,11 +192,11 @@ div.salute, p.salute { margin: 1em 0 1em 4em; text-indent: 0em; font-style: ital
 .letter .salute { text-align: left; font-style: inherit; }
 .signed { margin-top: 1em; margin-bottom: 2em; text-indent: 0; text-align: right; }
 .sp { widows: 2; orphans: 2; }
-.sp p { text-indent: 0; }
+.sp p { text-indent: 0; line-height: 130%; margin-bottom: 0.9ex; }
 div.speaker, p.speaker { margin-top: 1.2em; margin-bottom: 0; font-weight: normal ; text-indent: 0; text-align: center; font-size: 85%; text-transform: uppercase; }
-.speaker  i, .speaker  em { font-variant: normal; text-transform: none; font-size: 90%; }
+.speaker  i, .speaker  em { font-variant: normal; text-transform: none; font-size: 95%; }
 span.space { display: inline-block; }
-.stage { font-style: italic; font-variant: normal; font-size: 85%; }
+.stage { font-style: italic; font-variant: normal; font-size: 90%; }
 .stage .i, .stage em, .stage i { font-style: normal; }
 div.stage { text-align: justify; margin-top: 1ex; margin-bottom: 1ex; line-height: 110%; }
 div.stage.sc { font-style: normal; text-align: center; margin-left: auto; margin-right: auto; font-size: 105%; margin-bottom: 1ex; }
@@ -242,7 +242,7 @@ span.center { display: block; }
 .clear { clear: both; }
 .clear:after { content: " "; display: block; height: 0; clear: both; visibility: hidden; }
 .dialogue { margin: 0; padding: 0; }
-.dialogue li { line-height: inherit; text-align: justify; margin: 0; }
+.dialogue li { line-height: 130%; text-align: justify; margin: 0; }
 span.exquote { font-style: normal; }/* seg[@type='exquote'] */
 .hanging { margin-left: 1.5em; text-indent: -1.5em }
 .i, .italic { font-style: italic; }
