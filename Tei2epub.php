@@ -45,12 +45,12 @@ class Livrable_Tei2epub {
   );
 
 
-  
+
   /**
    * Constructor, initialize what is needed
    */
   public function __construct($srcfile, $logger=null, $pars=array()) {
-    if (!is_array($pars)) $pars=array(); 
+    if (!is_array($pars)) $pars=array();
     self::$_pars=array_merge(self::$_pars, $pars);
     if (is_a($srcfile, 'DOMDocument')) {
       $this->_srcdoc = $srcfile;
@@ -84,26 +84,26 @@ class Livrable_Tei2epub {
       // normalize indentation of XML before all processing
       $xml=file_get_contents($this->_srcfile);
       $xml=preg_replace(array('@\r\n@', '@\r@', '@\n[ \t]+@'), array("\n", "\n", "\n"), $xml);
-      // $this->doc->recover=true; // no recover, display errors 
+      // $this->doc->recover=true; // no recover, display errors
       if(!$this->_srcdoc->loadXML($xml, LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NSCLEAN)) {
          self::log("XML error ".$this->_srcfile."\n");
          return false;
       }
     }
-    // load 
+    // load
     $this->_srcdoc->preserveWhiteSpace = false;
     $this->_srcdoc->formatOutput = true;
     if ($this->_srcfile) $this->_srcdoc->documentURI = realpath($this->_srcfile);
     // should resolve xinclude
     $this->_srcdoc->xinclude(LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NSCLEAN );
-    
+
     self::log(E_USER_NOTICE, 'load '. round(microtime(true) - self::$_time, 3)." s.");
     // @xml:id may be used as a href path, example images
     self::$_pars['bookname'] = $this->_srcdoc->documentElement->getAttributeNS('http://www.w3.org/XML/1998/namespace', 'id');
     if (!self::$_pars['bookname']) self::$_pars['bookname'] = self::$_pars['filename'];
     return $this->_srcdoc;
   }
-  
+
   /**
    * Generate an epub from a TEI file
    */
@@ -113,14 +113,14 @@ class Livrable_Tei2epub {
     else if (isset(self::$_pars['srcdir'])) $destfile=self::$_pars['srcdir'].self::$_pars['filename'].'.epub';
     // in tmp dir
     else  if (isset(self::$_pars['filename'])) $destfile=sys_get_temp_dir().'/'.self::$_pars['filename'].'.epub';
-    // a 
+    // a
     else $destfile = tempnam(null, 'LIV');
     if(!$template) $template = dirname(__FILE__).'/template.epub/';
     $imagesdir = 'Images/';
     $timeStart = microtime(true);
     if (!$this->_srcdoc) $this->load(); // srcdoc may have been modified before (ex: naked version)
     $destinfo=pathinfo($destfile);
-    // TOTHINK 
+    // TOTHINK
     $destdir=$destinfo['dirname'].'/'.$destinfo['filename'].'-epub/';
     Phips_File::newDir($destdir);
     // copy the template folder
@@ -137,11 +137,11 @@ class Livrable_Tei2epub {
     self::log(E_USER_NOTICE, 'epub, images '. round(microtime(true) - self::$_time, 3)." s.\n");
     // create xhtml pages
     $report = self::transform(
-      dirname(__FILE__) . '/xsl/tei2epub.xsl', 
-      $doc, 
-      null, 
+      dirname(__FILE__) . '/xsl/tei2epub.xsl',
+      $doc,
+      null,
       array(
-        'destdir' => $destdir . 'OEBPS/', 
+        'destdir' => $destdir . 'OEBPS/',
         '_html' => '.xhtml',
         'opf' => $opf,
       )
@@ -157,11 +157,11 @@ class Livrable_Tei2epub {
       copy(self::$_pars['srcdir'].$cover, $destdir.'OEBPS/' . $imagesdir . $cover);
     }
     if ($cover) $params['cover'] =  $imagesdir .$cover;
-    // opf file 
+    // opf file
     self::transform(
-      dirname(__FILE__) . '/xsl/tei2opf.xsl', 
-      $doc, 
-      $destdir . 'OEBPS/content.opf', 
+      dirname(__FILE__) . '/xsl/tei2opf.xsl',
+      $doc,
+      $destdir . 'OEBPS/content.opf',
       array(
         '_html' => '.xhtml',
         'opf' => $opf,
@@ -171,11 +171,11 @@ class Livrable_Tei2epub {
     self::log(E_USER_NOTICE, 'epub, opf '. round(microtime(true) - self::$_time, 3)." s.");
     /* ncx not needed in epub3 but useful under firefox epubreader */
     self::transform(
-      dirname(__FILE__) . '/xsl/tei2ncx.xsl', 
-      $doc, 
-      $destdir.'OEBPS/toc.ncx', 
+      dirname(__FILE__) . '/xsl/tei2ncx.xsl',
+      $doc,
+      $destdir.'OEBPS/toc.ncx',
       array(
-        '_html'=>'.xhtml', 
+        '_html'=>'.xhtml',
         // 'filename' => self::$_pars['filename'],
       )
     );
@@ -207,7 +207,7 @@ class Livrable_Tei2epub {
     foreach ($doc->getElementsByTagNameNS('http://www.tei-c.org/ns/1.0', 'graphic') as $el) {
       $this->img($el->getAttributeNode("url"), $href, $destdir);
     }
-    /* 
+    /*
     do not store images of pages, especially in tif
     foreach ($doc->getElementsByTagNameNS('http://www.tei-c.org/ns/1.0', 'pb') as $el) {
       $this->img($el->getAttributeNode("facs"), $hrefTei, $destdir, $hrefSqlite);
@@ -223,7 +223,7 @@ class Livrable_Tei2epub {
     $src=$att->value;
     // return if data image
     if (strpos($src, 'data:image') === 0) return;
-    
+
     // test if relative file path
     if (file_exists($test=dirname($this->_srcfile).'/'.$src)) $src=$test;
     // vendor specific etc/filename.jpg
@@ -252,7 +252,7 @@ class Livrable_Tei2epub {
     // resize ?
     // NO delete of <graphic> element if broken link
   }
-  
+
   /**
    * Transform a doc with the provided xslt
    */
@@ -299,7 +299,7 @@ class Livrable_Tei2epub {
     if ($count) { // is an XSLT error or an XSLT message, reformat here
       if(strpos($errstr, 'error')!== false) return false;
       else if ($errno == E_WARNING) $errno = E_USER_WARNING;
-    } 
+    }
     // a debug message in normal mode, do nothing
     if ($errno == E_USER_NOTICE && !self::$debug) return true;
     // not a user message, let work default handler
@@ -310,43 +310,50 @@ class Livrable_Tei2epub {
   }
 
   /**
-   * Command line interface for the class 
+   * Command line interface for the class
    */
   public static function cli() {
     $timeStart = microtime(true);
     array_shift($_SERVER['argv']); // shift first arg, the script filepath
-    if (!count($_SERVER['argv'])) exit('
-    usage    : php -f Tei2epub.php *.xml  destdir/?
-');
-    $destdir = null;
-    $force = false;
-    $update = false;
-    while ($arg=array_shift($_SERVER['argv'])) {
-      if ($arg[0]=='-') $arg=substr($arg,1);
-      if ($arg=="debug") self::$debug=true ; // more log info
-      else if ($arg=="force") $force=true; // force epub generation
-      else if ($arg=="update") $update=true; // force epub generation
-      else if (isset($destdir)) break;
-      else if (isset($srcglob)) $destdir=$arg;
-      else $srcglob=$arg;
+    $options = "force";
+    if (!count($_SERVER['argv'])) exit("
+    usage    : php -f Tei2epub.php ($options)? destdir/? *.xml
+
+    option?   : force, to overwrite all generated epub
+    destdir/? : optional destination directory, ending by slash
+    *.xml     : glob patterns are allowed, with or without quotes
+
+");
+    $opt = null;
+    if( preg_match( "/^($options)\$/", trim($_SERVER['argv'][0], '- ') )) {
+      $opt = array_shift($_SERVER['argv']);
+      $opt = trim($opt, '- ');
     }
-    if ($destdir) {
-      $destdir = rtrim($destdir, '/\\') . '/';
-      if ($force) Phips_File::newDir($destdir); // ?
-      fwrite(STDERR, "Scan $srcglob, destdir:$destdir\n");
+
+    $lastc = substr($_SERVER['argv'][0], -1);
+    if ('/' == $lastc || '\\' == $lastc) {
+      $destdir = array_shift($_SERVER['argv']);
+      $destdir = rtrim($destdir, '/\\').'/';
+      if (!file_exists($destdir)) {
+        mkdir($destdir, 0775, true);
+        @chmod($dir, 0775);  // let @, if www-data is not owner but allowed to write
+      }
     }
-    else fwrite(STDERR, "Scan $srcglob\n");
-    Phips_File::scanglob($srcglob, function($srcfile) use($destdir, $update, $force) {
-      $pathinfo=pathinfo($srcfile);
-      // if destdir desired, flatten destfile
-      if ($destdir) $destfile = $destdir.$pathinfo['filename'].'.epub';
-      else $destfile = $pathinfo['dirname'].'/'.$pathinfo['filename'].'.epub';
-      if ($update && file_exists($destfile) && filemtime($destfile) > filemtime($srcfile)) return;
-      fwrite(STDERR, "$srcfile > $destfile\n");
-      // do something
-      $livre = new Livrable_Tei2epub($srcfile, STDERR);
-      $livre->epub($destfile);
-    });
+    $count = 0;
+    $ext = ".epub";
+    foreach ($_SERVER['argv'] as $glob) {
+      foreach(glob($glob) as $srcfile) {
+        $count++;
+        if (isset($destdir) ) $destfile = $destdir.pathinfo($srcfile,  PATHINFO_FILENAME).$ext;
+        else $destfile=dirname($srcfile).'/'.pathinfo($srcfile,  PATHINFO_FILENAME).$ext;
+        if ("force" == $opt); // overwrite
+        else if (!file_exists($destfile)); // do not exist
+        else if (filemtime($srcfile) <= filemtime($destfile)) continue; // epub is newer
+        fwrite(STDERR, "$count. $srcfile > $destfile\n");
+        $livre = new Livrable_Tei2epub($srcfile, STDERR);
+        $livre->epub($destfile);
+      }
+    }
     fwrite(STDERR, (number_format(microtime(true) - $timeStart, 3))." s.\n");
     exit;
   }
