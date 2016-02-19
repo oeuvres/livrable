@@ -171,17 +171,17 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
   <xsl:template match="tei:back | tei:body | tei:front" mode="opf">
     <xsl:param name="type"/>
     <xsl:choose>
+      <!-- simple content -->
+      <xsl:when test="tei:p | tei:l | tei:list | tei:argument | tei:table | tei:docTitle | tei:docAuthor">
+        <xsl:call-template name="item">
+          <xsl:with-param name="type" select="$type"/>
+        </xsl:call-template>
+      </xsl:when>
       <!-- Sections, blocks will be lost -->
       <xsl:when test="descendant::*[key('split', generate-id())]">
         <xsl:apply-templates select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage" mode="opf">
           <xsl:with-param name="type" select="$type"/>
         </xsl:apply-templates>
-      </xsl:when>
-      <!-- simple content -->
-      <xsl:when test="tei:p|tei:l|tei:list|tei:argument|tei:table">
-        <xsl:call-template name="item">
-          <xsl:with-param name="type" select="$type"/>
-        </xsl:call-template>
       </xsl:when>
     </xsl:choose>
   </xsl:template>

@@ -156,6 +156,8 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
     </xsl:if>
     <xsl:apply-templates select="tei:front | tei:group | tei:body | tei:back " mode="epub"/>
   </xsl:template>
+  <!-- For some books, the front is short, no realt <div> -->
+  
   <!-- title page and blurb entry -->
   <xsl:template mode="epub" match="
     /tei:TEI/tei:text/*[self::tei:front | self::tei:back]/*[self::tei:argument | self::tei:castList | self::tei:epilogue | self::tei:performance | self::tei:prologue | self::tei:set | self::tei:titlePage]">
@@ -225,16 +227,15 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
   <!-- section container -->
   <xsl:template match="tei:back | tei:body | tei:front" mode="epub">
     <xsl:choose>
+      <!-- simple content -->
+      <xsl:when test="tei:p|tei:l|tei:list|tei:argument|tei:table|tei:docTitle|tei:docAuthor">
+        <xsl:call-template name="document"/>
+      </xsl:when>
       <!-- Sections, blocks will be lost -->
       <xsl:when test="descendant::*[key('split', generate-id())]">
         <xsl:apply-templates select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage" mode="epub"/>
       </xsl:when>
-      <!-- simple content -->
-      <xsl:when test="tei:p|tei:l|tei:list|tei:argument|tei:table">
-        <xsl:call-template name="document"/>
-      </xsl:when>
     </xsl:choose>
-    <xsl:apply-templates select="tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7" mode="epub"/>
   </xsl:template> 
   <!-- Sections, candidates for split -->
   <xsl:template match=" tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 | tei:group" mode="epub">

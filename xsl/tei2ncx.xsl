@@ -9,27 +9,18 @@
 </ul>
 
 -->
-<xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.1"
-    xmlns:tei="http://www.tei-c.org/ns/1.0" 
-    xmlns="http://www.daisy.org/z3986/2005/ncx/"
-    xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/"
-    exclude-result-prefixes="tei ncx"
-    
-    xmlns:exslt="http://exslt.org/common"
-    extension-element-prefixes="exslt"
-  >
+<xsl:transform exclude-result-prefixes="tei ncx" extension-element-prefixes="exslt" version="1.1" xmlns="http://www.daisy.org/z3986/2005/ncx/" xmlns:exslt="http://exslt.org/common" xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:import href="../../Teinte/common.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
-  <xsl:output encoding="UTF-8" indent="yes" format-public="-//NISO//DTD ncx 2005-1//EN" format-system="http://www.daisy.org/z3986/2005/ncx-2005-1.dtd"/>
+  <xsl:output encoding="UTF-8" format-public="-//NISO//DTD ncx 2005-1//EN" format-system="http://www.daisy.org/z3986/2005/ncx-2005-1.dtd" indent="yes"/>
   <!-- Comment profond aller ? -->
-  
   <!-- Nom de l'xslt appelante -->
   <xsl:variable name="this">tei_ncx.xsl</xsl:variable>
   <xsl:template match="/">
-    <ncx  version="2005-1">
+    <ncx version="2005-1">
       <head>
-        <meta name="dtb:uid" content="{$identifier}"/>
+        <meta content="{$identifier}" name="dtb:uid"/>
         <!--
         <meta name="dtb:depth" content="{$depth}"/>
         <xsl:param name="depth">
@@ -56,8 +47,8 @@
     </xsl:choose>
   </xsl:param>
         -->
-        <meta name="dtb:totalPageCount" content="0"/>
-        <meta name="dtb:maxPageNumber" content="0"/>
+        <meta content="0" name="dtb:totalPageCount"/>
+        <meta content="0" name="dtb:maxPageNumber"/>
       </head>
       <docTitle>
         <text>
@@ -113,8 +104,8 @@
             </navLabel>
             <content src="toc{$_html}"/>
           </navPoint>
-          <xsl:apply-templates select="/*/tei:text/*/*" mode="ncx">
-            
+          <xsl:apply-templates mode="ncx" select="/*/tei:text/*">
+            <xsl:with-param name="depth" select="3"/>
           </xsl:apply-templates>
           <xsl:if test="$fnpage != ''">
             <navPoint id="{$fnpage}">
@@ -133,7 +124,7 @@
       <xsl:choose>
         <xsl:when test="function-available('exslt:node-set')">
           <!-- renumber navPoint -->
-          <xsl:apply-templates select="exslt:node-set($navMap)" mode="playOrder"/>
+          <xsl:apply-templates mode="playOrder" select="exslt:node-set($navMap)"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:copy-of select="$navMap"/>
@@ -145,22 +136,22 @@
   <xsl:template match="*" mode="ncx"/>
   <xsl:template match="tei:TEICorpus" mode="ncx">
     <xsl:param name="depth"/>
-    <xsl:apply-templates select="*" mode="ncx">
+    <xsl:apply-templates mode="ncx" select="*">
       <xsl:with-param name="depth" select="$depth"/>
-    </xsl:apply-templates> 
+    </xsl:apply-templates>
   </xsl:template>
   <xsl:template match="tei:TEI | tei:TEI.2" mode="ncx">
     <xsl:param name="depth"/>
-    <xsl:apply-templates select="tei:text" mode="ncx">
+    <xsl:apply-templates mode="ncx" select="tei:text">
       <xsl:with-param name="depth" select="$depth"/>
-    </xsl:apply-templates> 
+    </xsl:apply-templates>
   </xsl:template>
   <!-- traverser -->
   <xsl:template match="/*/tei:text" mode="ncx">
     <xsl:param name="depth"/>
-    <xsl:apply-templates select="* " mode="ncx">
+    <xsl:apply-templates mode="ncx" select="* ">
       <xsl:with-param name="depth" select="$depth"/>
-    </xsl:apply-templates> 
+    </xsl:apply-templates>
   </xsl:template>
   <!-- entry is always created  -->
   <xsl:template match="/*/tei:text/tei:front/tei:titlePage" mode="ncx"/>
@@ -172,13 +163,30 @@
     <xsl:call-template name="navPoint">
       <xsl:with-param name="depth" select="$depth - 1"/>
     </xsl:call-template>
-  </xsl:template> 
-  <!-- Sections, split candidates -->
-  <xsl:template mode="ncx" match="
-    tei:body | tei:front | tei:back | tei:group |
-    tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 
-">  
+  </xsl:template>
+  <xsl:template match="tei:back | tei:body | tei:front" mode="ncx">
     <xsl:param name="depth"/>
+    <xsl:choose>
+      <!-- simple content ? -->
+      <xsl:when test="tei:p | tei:l | tei:list | tei:argument | tei:table | tei:docTitle | tei:docAuthor">
+        <xsl:call-template name="navPoint">
+          <xsl:with-param name="depth" select="0"/>
+        </xsl:call-template>
+      </xsl:when>
+      <!-- div content -->
+      <xsl:when test="descendant::*[key('split', generate-id())]">
+        <xsl:apply-templates select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage" mode="ncx">
+          <xsl:with-param name="depth" select="$depth - 1"/>
+        </xsl:apply-templates>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  <!-- Sections, split candidates -->
+  <xsl:template match="
+    tei:group |
+    tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 
+" mode="ncx">
+    <xsl:param name="depth" select="2"/>
     <xsl:call-template name="navPoint">
       <xsl:with-param name="depth" select="$depth - 1"/>
     </xsl:call-template>
@@ -186,13 +194,22 @@
   <!-- Créer un point de nav -->
   <xsl:template name="navPoint">
     <xsl:param name="depth"/>
+    <xsl:param name="id">
+      <xsl:call-template name="id"/>
+    </xsl:param>
+    <xsl:param name="title">
+      <xsl:call-template name="title"/>
+    </xsl:param>
+    <xsl:param name="href">
+      <xsl:call-template name="href"/>
+    </xsl:param>
     <navPoint>
       <xsl:attribute name="id">
-        <xsl:call-template name="id"/>
+        <xsl:value-of select="$id"/>
       </xsl:attribute>
       <xsl:attribute name="playOrder">
         <xsl:variable name="playOrder">
-          <xsl:number level="any" count="tei:group | tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 | /*/tei:text/tei:front/tei:argument "/>
+          <xsl:number count="tei:group | tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 | /*/tei:text/tei:front/tei:argument " level="any"/>
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="$cover">
@@ -206,37 +223,34 @@
       </xsl:attribute>
       <navLabel>
         <text>
-          <xsl:variable name="title">
-            <xsl:call-template name="title"/>
-          </xsl:variable>
           <xsl:value-of select="normalize-space($title)"/>
         </text>
       </navLabel>
       <content>
         <xsl:attribute name="src">
-          <xsl:call-template name="href"/>
+          <xsl:value-of select="$href"/>
         </xsl:attribute>
       </content>
-      <xsl:if test="$depth != 0">
-        <xsl:apply-templates select="tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 | tei:argument[parent::tei:front]" mode="ncx">
+      <xsl:if test="$depth &gt; 0">
+        <xsl:apply-templates mode="ncx" select="tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 | tei:argument[parent::tei:front]">
           <xsl:with-param name="depth" select="$depth"/>
         </xsl:apply-templates>
       </xsl:if>
     </navPoint>
   </xsl:template>
- 
-
   <!-- Renuméroter la navigation -->
   <xsl:template match="node() | @*" mode="playOrder">
     <xsl:copy>
-      <xsl:apply-templates select="node() | @*" mode="playOrder"/>
+      <xsl:apply-templates mode="playOrder" select="node() | @*"/>
     </xsl:copy>
   </xsl:template>
   <!-- Always compute a sequential value for playOrder -->
   <xsl:template match="ncx:navPoint" mode="playOrder">
     <xsl:copy>
       <xsl:copy-of select="@*"/>
-      <xsl:attribute name="playOrder"><xsl:number count="ncx:navPoint" level="any"/></xsl:attribute>
+      <xsl:attribute name="playOrder">
+        <xsl:number count="ncx:navPoint" level="any"/>
+      </xsl:attribute>
       <xsl:apply-templates mode="playOrder"/>
     </xsl:copy>
   </xsl:template>

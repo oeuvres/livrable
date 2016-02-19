@@ -7,9 +7,6 @@ LGPL http://www.gnu.org/licenses/lgpl.html
 
 */
 
-// include needed dependances
-include_once(dirname(__FILE__).'/Phips/File.php');
-
 /**
  * Transform TEI in epub
  */
@@ -122,9 +119,9 @@ class Livrable_Tei2epub {
     $destinfo=pathinfo($destfile);
     // TOTHINK
     $destdir=$destinfo['dirname'].'/'.$destinfo['filename'].'-epub/';
-    Phips_File::newDir($destdir);
+    self::dirclean($destdir);
     // copy the template folder
-    Phips_File::copy($template, $destdir);
+    self::rcopy($template, $destdir);
     // get the content.opf template
     $opf =  $template . 'OEBPS/.content.opf';
     if (file_exists($f = $template . 'OEBPS/content.opf')) $opf = $f;
@@ -153,7 +150,7 @@ class Livrable_Tei2epub {
     else if (file_exists(self::$_pars['srcdir'].self::$_pars['filename'].'.png')) $cover=self::$_pars['filename'].'.png';
     else if (file_exists(self::$_pars['srcdir'].self::$_pars['filename'].'.jpg')) $cover=self::$_pars['filename'].'.jpg';
     if ($cover) {
-      Phips_File::newDir($destdir.'OEBPS/' . $imagesdir);
+      self::dirclean($destdir.'OEBPS/' . $imagesdir);
       copy(self::$_pars['srcdir'].$cover, $destdir.'OEBPS/' . $imagesdir . $cover);
     }
     if ($cover) $params['cover'] =  $imagesdir .$cover;
@@ -184,9 +181,9 @@ class Livrable_Tei2epub {
     // an empty epub is prepared with the mimetype
     copy(dirname(__FILE__).'/mimetype.epub', $destfile);
     // zip the dir content
-    Phips_File::zip($destfile, $destdir);
+    self::zip($destfile, $destdir);
     if (!self::$debug) { // delete tmp dir if not debug
-      Phips_File::newDir($destdir); // this is a strange behaviour, new dir will empty dir
+      self::dirclean($destdir); // this is a strange behaviour, new dir will empty dir
       rmdir($destdir);
     }
     // shall we return entire content of the file ?
@@ -237,7 +234,7 @@ class Livrable_Tei2epub {
     // test first if dst dir (example, epub for sqlite)
     if (isset($destdir)) {
       // create images folder only if images detected
-      if (!file_exists($destdir)) Phips_File::newDir($destdir);
+      if (!file_exists($destdir)) self::dirclean($destdir);
       // destination
       $i=2;
       // avoid duplicated files
@@ -307,6 +304,91 @@ class Livrable_Tei2epub {
     if (!self::$_logger);
     else if (is_resource(self::$_logger)) fwrite(self::$_logger, $errstr."\n");
     else if ( is_string(self::$_logger) && function_exists(self::$_logger)) call_user_func(self::$_logger, $errstr);
+  }
+  /**
+   * Delete all files in a directory, create it if not exist
+   */
+  static public function dirclean($dir, $depth=0)
+  {
+    if (is_file($dir)) return unlink($dir);
+    // attempt to create the folder we want empty
+    if (!$depth && !file_exists($dir)) {
+      mkdir($dir, 0775, true);
+      @chmod($dir, 0775);  // let @, if www-data is not owner but allowed to write
+      return;
+    }
+    // should be dir here
+    if (is_dir($dir)) {
+      $handle=opendir($dir);
+      while (false !== ($entry = readdir($handle))) {
+        if ($entry == "." || $entry == "..") continue;
+        self::dirclean($dir.'/'.$entry, $depth+1);
+      }
+      closedir($handle);
+      // do not delete the root dir
+      if ($depth > 0) rmdir($dir);
+      // timestamp newDir
+      else touch($dir);
+      return;
+    }
+  }
+  /**
+   * Recursively copy files from one directory to another
+   *
+   * @param String $src - Source of files being moved
+   * @param String $dest - Destination of files being moved
+   */
+  static function rcopy($src, $dest){
+      // If source is not a directory stop processing
+      if(!is_dir($src)) return false;
+      // If the destination directory does not exist create it
+      if(!is_dir($dest)) {
+        // If the destination directory could not be created stop processing
+        if(!mkdir($dest)) return false;
+      }
+      // Open the source directory to read in files
+      $it = new DirectoryIterator($src);
+      foreach($it as $f) {
+          if($f->isFile()) {
+              copy($f->getRealPath(), "$dest/" . $f->getFilename());
+          } else if(!$f->isDot() && $f->isDir()) {
+              self::rcopy($f->getRealPath(), "$dest/$f");
+          }
+      }
+  }
+  /**
+   * Zip folder to a zip file
+   */
+  static public function zip($zipfile, $srcdir)
+  {
+    $zip = new ZipArchive;
+    if(!file_exists($zipfile)) $zip->open($zipfile, ZIPARCHIVE::CREATE);
+    else $zip->open($zipfile);
+    self::zipdir($zip, $srcdir);
+    $zip->close();
+  }
+  /**
+   * The recursive method to zip dir
+   * start with files (especially for mimetype epub)
+   */
+  static private function zipdir($zip, $srcdir, $localdir="")
+  {
+    $srcdir=rtrim($srcdir, "/\\").'/';
+    // files
+    foreach( array_filter(glob($srcdir . '/*'), 'is_file') as $path ) {
+      $name = basename($path);
+      if ($name == '.' || $name == '..') continue;
+      $localname = $localdir . $name;
+      $zip->addFile($path, $localname);
+    }
+    // dirs
+    foreach( glob($srcdir . '/*', GLOB_ONLYDIR) as $path ) {
+      $name = basename($path) . '/';
+      if ($name == '.' || $name == '..') continue;
+      $localname = $localdir . $name;
+      $zip->addEmptyDir($localname);
+      self::zipdir($zip, $path, $localname);
+    }
   }
 
   /**
