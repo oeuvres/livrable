@@ -31,6 +31,7 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
   </xsl:template>
   <xsl:template match="opf:package/text() | opf:metadata/text() | opf:manifest/text() | opf:spine/text()" mode="opf:template"/>
   <xsl:template match="comment()" mode="opf:template"/>
+  <xsl:template match="processing-instruction()" mode="opf:template"/>
   <xsl:template match="opf:package" mode="opf:template">
     <package unique-identifier="dcidid" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">
       <xsl:choose>

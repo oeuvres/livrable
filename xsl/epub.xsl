@@ -12,6 +12,8 @@ Epub parameters
   exclude-result-prefixes="tei" 
   >
   <xsl:param name="cover"/>
+  <!-- Used on opf template  -->
+  <xsl:key name="opfid" match="*" use="@id"/>
   <!-- @type="character" pfff. -->
   <xsl:key name="split" match="
     tei:*[@type][self::tei:div or self::tei:div0 or self::tei:div1 or self::tei:div2 or self::tei:div3][

@@ -9,14 +9,24 @@
 </ul>
 
 -->
-<xsl:transform exclude-result-prefixes="tei ncx" extension-element-prefixes="exslt" version="1.1" xmlns="http://www.daisy.org/z3986/2005/ncx/" xmlns:exslt="http://exslt.org/common" xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:transform 
+  exclude-result-prefixes="tei ncx opf" 
+  extension-element-prefixes="exslt" version="1.1" 
+  xmlns="http://www.daisy.org/z3986/2005/ncx/"
+  xmlns:exslt="http://exslt.org/common" 
+  xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/"
+  xmlns:opf="http://www.idpf.org/2007/opf"
+  xmlns:tei="http://www.tei-c.org/ns/1.0" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  >
   <xsl:import href="../../Teinte/common.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
   <xsl:output encoding="UTF-8" format-public="-//NISO//DTD ncx 2005-1//EN" format-system="http://www.daisy.org/z3986/2005/ncx-2005-1.dtd" indent="yes"/>
-  <!-- Comment profond aller ? -->
-  <!-- Nom de l'xslt appelante -->
-  <xsl:variable name="this">tei_ncx.xsl</xsl:variable>
+  <!-- Opf template, may contain spine items to add to the toc -->
+  <xsl:param name="opf"/>
+  <!-- This xsl -->
+  <xsl:variable name="this">tei2ncx.xsl</xsl:variable>
   <xsl:template match="/">
     <ncx version="2005-1">
       <head>
@@ -118,6 +128,30 @@
               </navLabel>
               <content src="{$fnpage}{$_html}"/>
             </navPoint>
+          </xsl:if>
+          <!-- Loop on <spine> template -->
+          <xsl:if test="$opf != ''">
+            <xsl:for-each select="document($opf)/opf:package/opf:spine/opf:itemref">
+              <navPoint id="{@id|@idref}">
+                <navLabel>
+                  <text>
+                    <xsl:choose>
+                      <xsl:when test="processing-instruction('title')">
+                        <xsl:value-of select="processing-instruction('title')"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="translate(@idref, '_', ' ')"/>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </text>
+                </navLabel>
+                <content>
+                  <xsl:attribute name="src">
+                    <xsl:value-of select="key('opfid', @idref)/@href"/>
+                  </xsl:attribute>
+                </content>
+              </navPoint>
+            </xsl:for-each>
           </xsl:if>
         </navMap>
       </xsl:variable>

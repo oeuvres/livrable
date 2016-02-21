@@ -77,7 +77,7 @@ figure img { padding : 6px; }
 figure a { text-decoration: none; border-bottom: none; }
 figure a:hover { text-decoration: none; border-bottom: none; }
 form label { padding: 0; line-height: 100%; }
-h1, h2, h3, h4, h5, h6 { text-indent:0; line-height:110%; clear: both; -webkit-hyphens: none !important; adobe-hyphenate: none; -moz-hyphens: none; hyphens: none; page-break-after: avoid; page-break-inside: avoid; orphans: 0; }
+h1, h2, h3, h4, h5, h6 { text-indent:0; line-height:110%; clear: both; -webkit-hyphens: none ; adobe-hyphenate: none; -moz-hyphens: none; hyphens: none; page-break-after: avoid; page-break-inside: avoid; orphans: 0; }
 h1 { text-align: center; margin-left: auto; margin-right: auto; font-size: 1.5em; font-weight: normal; margin-top: 2em; margin-bottom: 1em; padding-top: 1em; margin-top: 0; }
 h1 a, h1 a:link, h1 a:visited, h2 a, h2 a:link, h2 a:visited, h3 a, h3 a:link, h3 a:visited { color: inherit; text-decoration: none; border-bottom-color: transparent; }
 h1 small { font-weight: normal; font-size: 85%; opacity: 1; letter-spacing: normal; font-variant: normal; text-shadow: none; }
@@ -107,11 +107,12 @@ pre { width: 95%; line-height: 100%; border-left: 1px dotted #808080; padding-le
 q { quotes: '' ''; }
 q q { font-style: italic; }
 samp { font-family: inherit; font-style: italic; }
-section { display: block; clear: both; }
+section { clear: both; }
 select { padding: 0 0.5ex; }
 small { font-weight: normal; }
-sup { line-height: 5%; vertical-align: text-top; font-variant: normal; }
-sub { line-height: 5%; vertical-align: text-bottom; font-variant: normal; }
+sup, sub { font-variant: normal; line-height: 5%; font-size: 70%; }
+sup { vertical-align: text-top; }
+sub { vertical-align: text-bottom; }
 textarea { width: 100%; height: 20em; display: block; }
 table a { border: none; }
 table a:hover { border-width: 0; }
@@ -134,6 +135,7 @@ p.caption { font-weight: bold; }
 .cb, .pb, .ed, small.l, small.l-n { font-weight: normal; font-style: normal; float: right; color: grey; font-size: 65%; margin: 0 0 0 1ex; text-indent: 0; text-decoration: none; border: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
 a.ed, a.pb {}
 small.ed { color: grey; font-size: 90%; }
+.front > div.castList { page-break-before: always; }
 ul.castList { list-style: none; }
 .choice { background-color: #EEEEEE }
 h1.collection, h1.collection-sub { font-weight: normal; padding: 0; margin: 0; }
@@ -212,15 +214,14 @@ section section .subtitle { font-size: 150%; }
 i .title, .i .title { font-style: normal; }
 .titlePage { text-align: center; margin-top: 1.5em; }
 .titlePage h1.sub { font-weight: normal; margin-top: 0; padding-top: 0; font-size: 85%; }
+.titlePage p, .titlePage blockquote, .titlePage .l  { text-align: center; text-indent: 0; margin-left: auto; margin-right: auto; }
+.titlePage p { margin-top: 1em; margin-bottom: 1em; }
 .titlePage .argument { font-style: normal; margin: 1em auto 1em auto; text-align: center; }
-.titlePage .argument p { margin-left: auto; margin-right: auto; text-align: center; }
 .titlePage .byline { font-weight: bold; margin-top: 4em; margin-top: 4em; margin-left: auto; margin-right: auto; text-align: center; }
 .titlePage .docAuthor { margin-top: 1em; margin-bottom: 1em; }
 .titlePage figure { border: none; margin-top: 5em; font-weight: normal; }
 .titlePage > .docImprint { font-size: 75%; line-height: 120%; }
 .titlePage div.rights { font-size: 65%; }
-.titlePage p, .titlePage blockquote, .titlePage .l  { text-align: center; text-indent: 0; margin-left: 0; margin-right: 0; }
-.titlePage p { margin-top: 1em; margin-bottom: 1em; }
 .titlePage .docDate { }
 
 .trailer { font-style: italic; text-align: center; text-indent: 0; margin-top: 2em; }
@@ -261,6 +262,7 @@ ul.menu { font-size: 85%; line-height: 95%; }
 div.ornament { line-height: 95%; letter-spacing: 0.6em; margin: 1em 5em; text-align: center;  margin-left: auto; margin-right: auto; }
 .page-break-before { page-break-before: always; height: 2em; height: 2rem; }
 .page-spacer { margin-top: 6em; height: 5em; border-top: 1px #CCCCCC solid; }
+div.privilege { page-break-before: always; }
 .right { text-align: right; }
 p.right { margin-bottom: 1em; }
 div.right { margin-left: 25%; }
@@ -280,7 +282,7 @@ mark a.prev, .mark a.prev { background-color: white }
 mark a.next, .mark a.next { background-color: white }
 
 /* list styles */
-ul.none, ol.none, ul.simple, ol.simple, ol.tree, ol.tree ol, ul.tree, ul.tree ul { list-style-type: none; }
+ul.none, ol.none, ul.simple, ol.simple, ol.tree, ol.tree ol, ul.tree, ul.tree ul  { list-style-type: none; }
 .dialogue  { list-style-type: none; }
 .circle { list-style-type: circle }
 .decimal { list-style-type: decimal }

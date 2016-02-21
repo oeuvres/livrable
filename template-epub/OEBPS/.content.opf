@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 
 LGPL http://www.gnu.org/licenses/lgpl.html
 © 2013 frederic.glorieux@fictif.org
@@ -28,11 +28,16 @@ LGPL http://www.gnu.org/licenses/lgpl.html
     <item id="logogallica" href="logo_gallica.png" media-type="image/png"/>
     <item id="logobnf" href="bnf.gif" media-type="image/gif"/>
     -->
+    <item href="colophon.xhtml" media-type="application/xhtml+xml" id="colophon"/>
   </manifest>
   <!-- required -->
   <spine>
-    <!-- 
+    <!--
     <itemref idref="apropos"/>
     -->
+    <!-- The processing instruction provide a title for tocs -->
+    <itemref idref="colophon">
+      <?title Colophon?>
+    </itemref>
   </spine>
 </package>

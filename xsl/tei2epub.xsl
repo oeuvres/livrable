@@ -84,12 +84,12 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
         </xsl:variable>
         <xsl:choose>
           <xsl:when test="$format = $epub2">
-            <div class="titlepage">
+            <div class="titlePage">
               <xsl:copy-of select="$html"/>
             </div>
           </xsl:when>
           <xsl:otherwise>
-            <section epub:type="titlepage" class="titlepage">
+            <section epub:type="titlepage" class="titlePage">
               <xsl:copy-of select="$html"/>
             </section>
           </xsl:otherwise>
@@ -127,7 +127,31 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
                   <xsl:with-param name="id">toc</xsl:with-param>
                 </xsl:call-template>
               </h1>
-              <xsl:call-template name="toc"/>
+              <ol class="tree">
+                <xsl:apply-templates select="tei:front" mode="li"/>
+                <xsl:apply-templates select="tei:body" mode="li"/>
+                <xsl:apply-templates select="tei:back" mode="li"/>
+                <!-- Loop on <spine> template -->
+                <xsl:if test="$opf != ''">
+                  <xsl:for-each select="document($opf)/opf:package/opf:spine/opf:itemref">
+                    <li>
+                      <a>
+                        <xsl:attribute name="href">
+                          <xsl:value-of select="key('opfid', @idref)/@href"/>
+                        </xsl:attribute>
+                        <xsl:choose>
+                          <xsl:when test="processing-instruction('title')">
+                            <xsl:value-of select="processing-instruction('title')"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:value-of select="translate(@idref, '_', ' ')"/>
+                          </xsl:otherwise>
+                        </xsl:choose>                      
+                      </a>
+                    </li>
+                  </xsl:for-each>
+                </xsl:if>
+              </ol>              
             </nav>
           </xsl:otherwise>
         </xsl:choose>

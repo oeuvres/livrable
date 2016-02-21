@@ -112,7 +112,7 @@ class Livrable_Tei2epub {
     else  if (isset(self::$_pars['filename'])) $destfile=sys_get_temp_dir().'/'.self::$_pars['filename'].'.epub';
     // a
     else $destfile = tempnam(null, 'LIV');
-    if(!$template) $template = dirname(__FILE__).'/template.epub/';
+    if(!$template) $template = dirname(__FILE__).'/template-epub/';
     $imagesdir = 'Images/';
     $timeStart = microtime(true);
     if (!$this->_srcdoc) $this->load(); // srcdoc may have been modified before (ex: naked version)
@@ -122,6 +122,13 @@ class Livrable_Tei2epub {
     self::dirclean($destdir);
     // copy the template folder
     self::rcopy($template, $destdir);
+    // check if there is a colophon where to write a date
+    if (file_exists($f = $destdir.'OEBPS/colophon.xhtml')) {
+      $cont = file_get_contents($f);
+      $cont = str_replace("%date%", strftime("%d/%m/%Y"),$cont);
+      file_put_contents($f, $cont);
+    }
+
     // get the content.opf template
     $opf =  $template . 'OEBPS/.content.opf';
     if (file_exists($f = $template . 'OEBPS/content.opf')) $opf = $f;
@@ -173,6 +180,7 @@ class Livrable_Tei2epub {
       $destdir.'OEBPS/toc.ncx',
       array(
         '_html'=>'.xhtml',
+        'opf' => $opf,
         // 'filename' => self::$_pars['filename'],
       )
     );
