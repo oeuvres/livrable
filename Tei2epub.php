@@ -12,6 +12,9 @@ LGPL http://www.gnu.org/licenses/lgpl.html
  */
 // cli usage
 set_time_limit(-1);
+if(ini_get('date.timezone')) date_default_timezone_set(ini_get('date.timezone'));
+else date_default_timezone_set("Europe/Paris");
+
 if (realpath($_SERVER['SCRIPT_FILENAME']) != realpath(__FILE__)); // file is include do nothing
 else if (php_sapi_name() == "cli") {
   Livrable_Tei2epub::cli();
