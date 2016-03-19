@@ -401,6 +401,33 @@ class Livrable_Tei2epub {
       self::zipdir($zip, $path, $localname);
     }
   }
+  /**
+   * Transform an epub file in mobi with the kindlegen program
+   */
+  public static function mobi($epubfile, $mobifile) {
+    $cmd = dirname(__FILE__)."/kindlegen";
+    if (!file_exists($kindlegen)) {
+      exit("
+To obtain mobi format, you should install the kindlegen program from Amazon
+https://www.amazon.com/gp/feature.html?docId=1000765211
+in $kindlegen
+      ");
+    }
+    $cmd = $cmd." ".$epubfile;
+    $last = exec ($cmd, $output, $status);
+    // error ?
+    $tmpfile = dirname($epubfile).'/'.pathinfo($epubfile, PATHINFO_FILENAME).".mobi";
+    if (!file_exists($tmpfile)) {
+      self::log(E_USER_ERROR, "\n".$status."\n".join("\n", $output)."\n".$last."\n");
+      return;
+    }
+    // create directories if neessary
+    if (!is_dir(dirname($mobifile))) {
+      mkdir(dirname($mobifile), 0775, true);
+      @chmod(dirname($mobifile), 0775);
+    }
+    rename( $tmpfile, $mobifile);
+  }
 
   /**
    * Command line interface for the class
@@ -408,19 +435,19 @@ class Livrable_Tei2epub {
   public static function cli() {
     $timeStart = microtime(true);
     array_shift($_SERVER['argv']); // shift first arg, the script filepath
-    $options = "force";
+    $options = "force|mobi";
     if (!count($_SERVER['argv'])) exit("
     usage    : php -f Tei2epub.php ($options)? destdir/? *.xml
 
-    option?   : force, to overwrite all generated epub
-    destdir/? : optional destination directory, ending by slash
-    *.xml     : glob patterns are allowed, with or without quotes
+    option *   : force, to overwrite all generated epub
+    destdir/ ? : optional destination directory, ending by slash
+    *.xml      : glob patterns are allowed, with or without quotes
 
 ");
-    $opt = null;
+    $opt = array();
     if( preg_match( "/^($options)\$/", trim($_SERVER['argv'][0], '- ') )) {
-      $opt = array_shift($_SERVER['argv']);
-      $opt = trim($opt, '- ');
+      $arg = trim(array_shift($_SERVER['argv']), '- ');
+      $opt[$arg] = true;
     }
 
     $lastc = substr($_SERVER['argv'][0], -1);
@@ -434,17 +461,24 @@ class Livrable_Tei2epub {
     }
     $count = 0;
     $ext = ".epub";
+    if(isset($opt['mobi'])) $ext = ".mobi";
     foreach ($_SERVER['argv'] as $glob) {
       foreach(glob($glob) as $srcfile) {
         $count++;
         if (isset($destdir) ) $destfile = $destdir.pathinfo($srcfile,  PATHINFO_FILENAME).$ext;
         else $destfile=dirname($srcfile).'/'.pathinfo($srcfile,  PATHINFO_FILENAME).$ext;
-        if ("force" == $opt); // overwrite
+        if (isset($opt['force'])); // overwrite
         else if (!file_exists($destfile)); // do not exist
         else if (filemtime($srcfile) <= filemtime($destfile)) continue; // epub is newer
         fwrite(STDERR, "$count. $srcfile > $destfile\n");
-        $livre = new Livrable_Tei2epub($srcfile, STDERR);
-        $livre->epub($destfile);
+        // work
+        if(isset($opt['mobi'])) {
+          self::mobi($srcfile, $destfile);
+        }
+        else {
+          $livre = new Livrable_Tei2epub($srcfile, STDERR);
+          $livre->epub($destfile);
+        }
       }
     }
     fwrite(STDERR, (number_format(microtime(true) - $timeStart, 3))." s.\n");
