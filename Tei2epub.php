@@ -405,7 +405,8 @@ class Livrable_Tei2epub {
    * Transform an epub file in mobi with the kindlegen program
    */
   public static function mobi($epubfile, $mobifile) {
-    $cmd = dirname(__FILE__)."/kindlegen";
+    $kindlegen = dirname(__FILE__)."/kindlegen";
+    if (!file_exists($kindlegen)) $kindlegen = dirname(__FILE__)."/kindlegen.exe";
     if (!file_exists($kindlegen)) {
       exit("
 To obtain mobi format, you should install the kindlegen program from Amazon
@@ -413,7 +414,7 @@ https://www.amazon.com/gp/feature.html?docId=1000765211
 in $kindlegen
       ");
     }
-    $cmd = $cmd." ".$epubfile;
+    $cmd = $kindlegen." ".$epubfile;
     $last = exec ($cmd, $output, $status);
     // error ?
     $tmpfile = dirname($epubfile).'/'.pathinfo($epubfile, PATHINFO_FILENAME).".mobi";
