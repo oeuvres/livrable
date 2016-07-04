@@ -2,3 +2,7 @@
 kindlegen
 
 epubcheck*
+
+*.epub
+
+*.mobi

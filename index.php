@@ -7,7 +7,7 @@ LGPL http://www.gnu.org/licenses/lgpl.html
 */
 error_reporting(E_ALL);
 include dirname(__FILE__).'/Tei2epub.php';
-include dirname(__FILE__).'/Phips/Web.php';
+include dirname(__FILE__).'/Web.php';
 if (file_exists($dir=dirname(dirname(__FILE__)).'/Odette/')) include($dir.'Odt2tei.php');
 if (file_exists($dir=dirname(dirname(__FILE__)).'/Teinte/')) include($dir.'Doc.php');
 // Post submit
@@ -73,7 +73,7 @@ else if (file_exists($f=dirname(__FILE__).'/header.php')) include($f);
 <?php
 if ($lang=='fr') echo '
   <span class="bar langBar">[ fr |<a href="?lang=en"> en </a>]</span>
-  <h1>Livrable, vous livre un livre électronique (epub) à partir d’un fichier XML/TEI
+  <h1>Livrable, un livre électronique (epub) à partir d’un fichier XML/TEI
   <br/>(ou odt, grâce à <a href="../Odette/">Odette</a>)</h1>
   <p class="byline">par Frédéric Glorieux</p>
 ';
