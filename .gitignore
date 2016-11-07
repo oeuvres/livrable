@@ -6,3 +6,7 @@ epubcheck*
 *.epub
 
 *.mobi
+
+*.xml
+
+*.txt

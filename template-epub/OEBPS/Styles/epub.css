@@ -132,7 +132,7 @@ blockquote .bibl { margin-left: 2em; display: block; }
 .byline { text-align: right; margin-left: 25%; margin-top: 4ex; text-indent: 0; }
 .byline .docAuthor { font-variant: small-caps; }
 p.caption { font-weight: bold; }
-.cb, .pb, .ed, small.l, small.l-n { font-weight: normal; font-style: normal; float: right; color: grey; font-size: 65%; margin: 0 0 0 1ex; text-indent: 0; text-decoration: none; border: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+.cb, .pb, .ed, small.l, small.l-n { font-weight: normal; font-style: normal; float: right; color: grey; font-size: 65%; margin: 0.2ex 0 0 1ex; text-indent: 0; text-decoration: none; border: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
 a.ed, a.pb {}
 small.ed { color: grey; font-size: 90%; }
 .front > div.castList { page-break-before: always; }

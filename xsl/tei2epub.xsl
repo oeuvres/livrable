@@ -128,7 +128,9 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
                 </xsl:call-template>
               </h1>
               <ol class="tree">
-                <xsl:apply-templates select="tei:front" mode="li"/>
+                <li>
+                  <xsl:call-template name="toc-front"/>
+                </li>
                 <xsl:apply-templates select="tei:body" mode="li"/>
                 <xsl:apply-templates select="tei:back" mode="li"/>
                 <!-- Loop on <spine> template -->
@@ -146,12 +148,12 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
                           <xsl:otherwise>
                             <xsl:value-of select="translate(@idref, '_', ' ')"/>
                           </xsl:otherwise>
-                        </xsl:choose>                      
+                        </xsl:choose>
                       </a>
                     </li>
                   </xsl:for-each>
                 </xsl:if>
-              </ol>              
+              </ol>
             </nav>
           </xsl:otherwise>
         </xsl:choose>
