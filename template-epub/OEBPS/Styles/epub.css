@@ -66,6 +66,9 @@ section,
 summary{
     display: block;
 }
+.dedication{
+    font-style: italic;
+}
 /** alignments, em values as fallback if no rem support */
 html,
 body{
@@ -573,7 +576,7 @@ a.pb{
     font-style: normal;
     color: grey;
     font-size: 65%;
-    margin: 0.2ex 0 0 0;
+    margin: 0.2ex 1ex 0 0.2ex;
     text-indent: 0;
     text-decoration: none;
     border: none;
@@ -1123,7 +1126,6 @@ ul.menu{
 .normal,
 .n{
     quotes: '' '';
-    color: #000;
     font-weight: normal;
     font-style: normal;
     text-decoration: none;
