@@ -3,7 +3,7 @@
 
 LGPL http://www.gnu.org/licenses/lgpl.html
 © 2012–2013 frederic.glorieux@fictif.org
-© 2013–2015 frederic.glorieux@fictif.org et LABEX OBVIL
+© 2013–2016 Université Paris-Sorbonne pour LABEX OBVIL, frederic.glorieux@fictif.org
 
 Epub pilot for xhtml transformation
 
@@ -128,12 +128,21 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
                 </xsl:call-template>
               </h1>
               <ol class="tree">
-                <li>
-                  <xsl:call-template name="toc-front"/>
-                </li>
-                <xsl:apply-templates select="tei:body" mode="li"/>
-                <xsl:apply-templates select="tei:back" mode="li"/>
-                <!-- Loop on <spine> template -->
+                <a href="titlePage{$_html}">
+                  <xsl:call-template name="message">
+                    <xsl:with-param name="id">titlePage</xsl:with-param>
+                  </xsl:call-template>
+                </a>
+                <xsl:apply-templates select="/*/tei:text/tei:front" mode="li"/>
+                <xsl:apply-templates select="/*/tei:text/tei:body" mode="li"/>
+                <xsl:apply-templates select="/*/tei:text/tei:group" mode="li"/>
+                <xsl:apply-templates select="/*/tei:text/tei:back" mode="li"/>
+                <xsl:if test="$fnpage != ''">
+                  <li>
+                    <a href="{$fnpage}{$_html}">Notes</a>
+                  </li>
+                </xsl:if>
+                <!-- Loop on <spine> template ? -->
                 <xsl:if test="$opf != ''">
                   <xsl:for-each select="document($opf)/opf:package/opf:spine/opf:itemref">
                     <li>

@@ -2,8 +2,8 @@
 <!--
 
 LGPL http://www.gnu.org/licenses/lgpl.html
+© 2014–2016 Université Paris-Sorbonne pour LABEX OBVIL, frederic.glorieux@fictif.org
 © 2013 frederic.glorieux@fictif.org
-© 2014–2015 frederic.glorieux@fictif.org et LABEX OBVIL
 
 
   Template for an epub package.
@@ -15,7 +15,7 @@ LGPL http://www.gnu.org/licenses/lgpl.html
   <!-- required -->
   <metadata>
     <!--
-      <dc:publisher>Override on source file</dc:publisher>
+      <dc:publisher>Override of source file</dc:publisher>
     -->
     <!-- if inserted fonts
     <meta property="ibooks:specified-fonts">true</meta>
@@ -24,10 +24,7 @@ LGPL http://www.gnu.org/licenses/lgpl.html
   <!-- required -->
   <manifest>
     <item href="Styles/epub.css" id="stylesheet" media-type="text/css"/>
-    <!-- BNF conformance
-    <item id="logogallica" href="logo_gallica.png" media-type="image/png"/>
-    <item id="logobnf" href="bnf.gif" media-type="image/gif"/>
-    -->
+    <item id="obvil_logo" href="Images/obvil_logo.png" media-type="image/png"/>
     <item href="colophon.xhtml" media-type="application/xhtml+xml" id="colophon"/>
   </manifest>
   <!-- required -->

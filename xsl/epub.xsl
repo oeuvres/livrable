@@ -29,8 +29,6 @@ Epub parameters
   <!-- Name of page where to project inline footnotes -->
   <xsl:param name="fnpage">
     <xsl:choose>
-      <!-- ereader are very slow to open another file  -->
-      <xsl:when test="true()"/>
       <xsl:when test="//tei:note">_footnotes</xsl:when>
     </xsl:choose>
   </xsl:param>

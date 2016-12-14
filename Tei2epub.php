@@ -27,7 +27,9 @@ class Livrable_Tei2epub {
   /** file path of source document, used to resolve relative links accros methods */
   private $_srcfile;
   /** Source DOM document for TEI file */
-  private $_srcdoc;
+  private $_dom;
+  /** Xpath processor */
+  private $_xpath;
   /** Log level, should be static for the xsl callback */
   private static $debug;
   /** time counter, should be static for the xsl callback */
@@ -53,7 +55,7 @@ class Livrable_Tei2epub {
     if (!is_array($pars)) $pars=array();
     self::$_pars=array_merge(self::$_pars, $pars);
     if (is_a($srcfile, 'DOMDocument')) {
-      $this->_srcdoc = $srcfile;
+      $this->_dom = $srcfile;
     }
     else {
       $this->_srcfile=$srcfile;
@@ -80,28 +82,28 @@ class Livrable_Tei2epub {
   public function load() {
     if ($this->_srcfile) {
       // for the source doc
-      $this->_srcdoc=new DOMDocument("1.0", "UTF-8");
+      $this->_dom=new DOMDocument("1.0", "UTF-8");
       // normalize indentation of XML before all processing
       $xml=file_get_contents($this->_srcfile);
       $xml=preg_replace(array('@\r\n@', '@\r@', '@\n[ \t]+@'), array("\n", "\n", "\n"), $xml);
       // $this->doc->recover=true; // no recover, display errors
-      if(!$this->_srcdoc->loadXML($xml, LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NSCLEAN)) {
+      if(!$this->_dom->loadXML($xml, LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NSCLEAN)) {
          self::log("XML error ".$this->_srcfile."\n");
          return false;
       }
     }
     // load
-    $this->_srcdoc->preserveWhiteSpace = false;
-    $this->_srcdoc->formatOutput = true;
-    if ($this->_srcfile) $this->_srcdoc->documentURI = realpath($this->_srcfile);
+    $this->_dom->preserveWhiteSpace = false;
+    $this->_dom->formatOutput = true;
+    if ($this->_srcfile) $this->_dom->documentURI = realpath($this->_srcfile);
     // should resolve xinclude
-    $this->_srcdoc->xinclude(LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NSCLEAN );
+    $this->_dom->xinclude(LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NSCLEAN );
 
     self::log(E_USER_NOTICE, 'load '. round(microtime(true) - self::$_time, 3)." s.");
     // @xml:id may be used as a href path, example images
-    self::$_pars['bookname'] = $this->_srcdoc->documentElement->getAttributeNS('http://www.w3.org/XML/1998/namespace', 'id');
+    self::$_pars['bookname'] = $this->_dom->documentElement->getAttributeNS('http://www.w3.org/XML/1998/namespace', 'id');
     if (!self::$_pars['bookname']) self::$_pars['bookname'] = self::$_pars['filename'];
-    return $this->_srcdoc;
+    return $this->_dom;
   }
 
   /**
@@ -118,7 +120,7 @@ class Livrable_Tei2epub {
     if(!$template) $template = dirname(__FILE__).'/template-epub/';
     $imagesdir = 'Images/';
     $timeStart = microtime(true);
-    if (!$this->_srcdoc) $this->load(); // srcdoc may have been modified before (ex: naked version)
+    if (!$this->_dom) $this->load(); // srcdoc may have been modified before (ex: naked version)
     $destinfo=pathinfo($destfile);
     // TOTHINK
     $destdir=$destinfo['dirname'].'/'.$destinfo['filename'].'-epub/';
@@ -128,7 +130,14 @@ class Livrable_Tei2epub {
     // check if there is a colophon where to write a date
     if (file_exists($f = $destdir.'OEBPS/colophon.xhtml')) {
       $cont = file_get_contents($f);
-      $cont = str_replace("%date%", strftime("%d/%m/%Y"),$cont);
+      /*
+      $xpath = $this->xpath();
+      $nl = $xpath->query("/"."*"."/tei:teiHeader//tei:idno");
+      if (!$nl->length) $idno = '';
+      else $idno = $nl->item(0)->textContent;
+      $cont = str_replace("%idno%", $idno, $cont);
+      */
+      $cont = str_replace("%date%", strftime("%d/%m/%Y"), $cont);
       file_put_contents($f, $cont);
     }
 
@@ -140,7 +149,7 @@ class Livrable_Tei2epub {
 
     // copy source Dom to local, before modification by images
     // copy referenced images (received modified doc after copy)
-    $doc=$this->images($this->_srcdoc, $imagesdir, $destdir.'OEBPS/' . $imagesdir);
+    $doc=$this->images($this->_dom, $imagesdir, $destdir.'OEBPS/' . $imagesdir);
     self::log(E_USER_NOTICE, 'epub, images '. round(microtime(true) - self::$_time, 3)." s.\n");
     // create xhtml pages
     $report = self::transform(
@@ -262,6 +271,17 @@ class Livrable_Tei2epub {
   }
 
   /**
+   * Set and return an XPath processor
+   */
+   public function xpath()
+   {
+     if ($this->_xpath) return $this->_xpath;
+     $this->_xpath = new DOMXpath($this->_dom);
+     $this->_xpath->registerNamespace('tei', "http://www.tei-c.org/ns/1.0");
+     return $this->_xpath;
+   }
+
+  /**
    * Transform a doc with the provided xslt
    */
   public function transform($xsl, $doc=null, $dst=null, $pars=array()) {
@@ -269,7 +289,7 @@ class Livrable_Tei2epub {
     if (!isset($pars['debug'])) $pars['debug'] = self::$debug;
     if (!$doc && isset($this)) {
       $this->load();
-      $doc = $this->_srcdoc;
+      $doc = $this->_dom;
     }
     $this->_trans->removeParameter('', '_html');
     $this->_xsl->load($xsl);

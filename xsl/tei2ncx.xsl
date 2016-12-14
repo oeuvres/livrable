@@ -104,16 +104,6 @@
               </navPoint>
             </xsl:otherwise>
           </xsl:choose>
-          <navPoint id="toc">
-            <navLabel>
-              <text>
-                <xsl:call-template name="message">
-                  <xsl:with-param name="id">toc</xsl:with-param>
-                </xsl:call-template>
-              </text>
-            </navLabel>
-            <content src="toc{$_html}"/>
-          </navPoint>
           <xsl:apply-templates mode="ncx" select="/*/tei:text/*">
             <xsl:with-param name="depth" select="3"/>
           </xsl:apply-templates>
@@ -129,7 +119,17 @@
               <content src="{$fnpage}{$_html}"/>
             </navPoint>
           </xsl:if>
-          <!-- Loop on <spine> template -->
+          <navPoint id="toc">
+            <navLabel>
+              <text>
+                <xsl:call-template name="message">
+                  <xsl:with-param name="id">toc</xsl:with-param>
+                </xsl:call-template>
+              </text>
+            </navLabel>
+            <content src="toc{$_html}"/>
+          </navPoint>
+          <!-- Loop on <spine> template to add to entry ? -->
           <xsl:if test="$opf != ''">
             <xsl:for-each select="document($opf)/opf:package/opf:spine/opf:itemref">
               <navPoint id="{@id|@idref}">
@@ -183,7 +183,7 @@
   <!-- traverser -->
   <xsl:template match="/*/tei:text" mode="ncx">
     <xsl:param name="depth"/>
-    <xsl:apply-templates mode="ncx" select="* ">
+    <xsl:apply-templates mode="ncx" select="*">
       <xsl:with-param name="depth" select="$depth"/>
     </xsl:apply-templates>
   </xsl:template>
@@ -200,18 +200,20 @@
   </xsl:template>
   <xsl:template match="tei:back | tei:body | tei:front" mode="ncx">
     <xsl:param name="depth"/>
+    <xsl:variable name="children" select="*[tei:head]"/>
     <xsl:choose>
-      <!-- simple content ? -->
-      <xsl:when test="tei:p | tei:l | tei:list | tei:argument | tei:table | tei:docTitle | tei:docAuthor">
-        <xsl:call-template name="navPoint">
-          <xsl:with-param name="depth" select="0"/>
-        </xsl:call-template>
-      </xsl:when>
+      <xsl:when test="count($children) &lt; 2"/>
       <!-- div content -->
       <xsl:when test="descendant::*[key('split', generate-id())]">
         <xsl:apply-templates select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage" mode="ncx">
           <xsl:with-param name="depth" select="$depth - 1"/>
         </xsl:apply-templates>
+      </xsl:when>
+      <!-- simple content ? -->
+      <xsl:when test="tei:p | tei:l | tei:list | tei:argument | tei:table | tei:docTitle | tei:docAuthor">
+        <xsl:call-template name="navPoint">
+          <xsl:with-param name="depth" select="0"/>
+        </xsl:call-template>
       </xsl:when>
     </xsl:choose>
   </xsl:template>

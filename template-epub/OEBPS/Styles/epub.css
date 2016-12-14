@@ -23,6 +23,8 @@ http://wiki.mobileread.com/wiki/CSS_HowTo
 */
 *{
 }
+html{ height:100% }
+body{ height:100% }
 body{
     font-family: Georgia, Amasis, Malabar, serif;
     -moz-hyphens: auto;
@@ -591,7 +593,7 @@ small.ed{
     font-size: 90%;
 }
 .front > div.castList{
-    page-break-before: always;
+    page-break-before: right;
 }
 ul.castList{
     list-style: none;
@@ -820,6 +822,13 @@ a.noteback{
     font-variant: normal;
     font-family: inherit;
 }
+.footnotes .page {
+  margin-top: 1em;
+}
+.footnotes .page .note {
+  margin-top: 1ex;
+  margin-bottom: 1ex;
+}
 div.salute,
 p.salute{
     margin: 1em 0 1em 4em;
@@ -925,7 +934,6 @@ section section .subtitle{
 }
 .title{
     font-style: italic;
-    page-break-before: left;
 }
 .title abbr{
     font-variant: small-caps;
@@ -940,8 +948,8 @@ i .title,
 }
 .titlePage{
     text-align: center;
-    margin-top: 1.5em;
-    page-break-before: left;
+    margin-top: 3em;
+    page-break-before: right;
 }
 .titlePage h1.sub{
     font-weight: normal;
@@ -1157,10 +1165,6 @@ div.ornament{
     height: 5em;
     border-top: 1px #CCCCCC solid;
 }
-div.privilege,
-div.preface{
-    page-break-before: always;
-}
 .right{
     text-align: right;
 }
@@ -1170,6 +1174,12 @@ p.right{
 div.right{
     margin-left: 25%;
 }
+section.dedication,
+section.privilege,
+section.preface{
+    page-break-before: right;
+}
+
 .sb{
     font-size: 200%;
     margin: 1em;

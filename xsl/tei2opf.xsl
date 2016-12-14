@@ -137,13 +137,13 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
         <itemref idref="coverhtml"/>
       </xsl:if>
       <itemref idref="titlePage"/>
-      <itemref idref="toc"/>
       <xsl:apply-templates select="$TEI/*" mode="opf">
         <xsl:with-param name="type">spine</xsl:with-param>
       </xsl:apply-templates>
       <xsl:if test="$fnpage != ''">
         <itemref idref="{$fnpage}"/>
       </xsl:if>
+      <itemref idref="toc"/>
       <xsl:apply-templates mode="opf:template"/>
     </spine>
   </xsl:template>
