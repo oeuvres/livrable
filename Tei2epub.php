@@ -114,7 +114,7 @@ class Livrable_Tei2epub
     $this->p['n'] = $this->_dom->documentElement->getAttribute( 'n' );
     if ( $this->p['filename'] ); // OK
     else if ( $this->p['n'] ) $this->p['filename'] = $this->p['n'];
-    else if ( $this->p['xmlid'] ) $this->p['filename'] = $this-p['xmlid'];
+    else if ( $this->p['xmlid'] ) $this->p['filename'] = $this->p['xmlid'];
     else $this->p['filename'] = "unlivre";
     return $this->_dom;
   }
