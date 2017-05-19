@@ -128,11 +128,13 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
                 </xsl:call-template>
               </h1>
               <ol class="tree">
-                <a href="titlePage{$_html}">
-                  <xsl:call-template name="message">
-                    <xsl:with-param name="id">titlePage</xsl:with-param>
-                  </xsl:call-template>
-                </a>
+                <li>
+                  <a href="titlePage{$_html}">
+                    <xsl:call-template name="message">
+                      <xsl:with-param name="id">titlePage</xsl:with-param>
+                    </xsl:call-template>
+                  </a>
+                </li>
                 <xsl:apply-templates select="/*/tei:text/tei:front" mode="li"/>
                 <xsl:apply-templates select="/*/tei:text/tei:body" mode="li"/>
                 <xsl:apply-templates select="/*/tei:text/tei:group" mode="li"/>
@@ -306,7 +308,7 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
-        <xsl:apply-templates select="tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7" mode="epub"/>
+        <xsl:apply-templates select=" tei:div | tei:div0 | tei:div1 | tei:div2 | tei:div3 | tei:div4 | tei:div5 | tei:div6 | tei:div7 " mode="epub"/>
         <!-- What about content after last section ? -->
       </xsl:when>
       <!-- Should be a leave with no children to split -->

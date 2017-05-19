@@ -23,7 +23,11 @@ else if (php_sapi_name() == "cli") {
 class Livrable_Tei2epub
 {
   /** Static parameters, used for example to communicate between XSL tests and calls */
-  private static $_pars=array();
+  public $p=array(
+    "workdir" => null, // where to produce genrated files
+    "srcdir" => null, // the folder of the source TEI file if XML given by file
+    "filename" => null, // the name of the file to output
+  );
   /** file path of source document, used to resolve relative links accros methods */
   private $_srcfile;
   /** Source DOM document for TEI file */
@@ -53,16 +57,19 @@ class Livrable_Tei2epub
    */
   public function __construct( $srcfile, $logger=null, $pars=array() )
   {
-    if (!is_array($pars)) $pars=array();
-    self::$_pars=array_merge(self::$_pars, $pars);
-    if (is_a($srcfile, 'DOMDocument')) {
+    if ( !is_array($pars) ) $pars=array();
+    $this->p = array_merge( $this->p, $pars);
+    if ( is_a( $srcfile, 'DOMDocument' ) ) {
       $this->_dom = $srcfile;
     }
     else {
       $this->_srcfile=$srcfile;
-      self::$_pars['srcdir'] = dirname($srcfile).'/';
-      self::$_pars['filename'] = pathinfo($srcfile, PATHINFO_FILENAME);
+      $this->p['srcdir'] = dirname( $srcfile ).'/';
+      if ( !$this->p['filename'] ) $this->p['filename'] = pathinfo( $srcfile, PATHINFO_FILENAME );
     }
+    // if ( $this->p['srcdir'] && is_writable( $this->p['srcdir'] ) ) $this->p['workdir'] = $this->p['srcdir'];
+    $this->p['workdir'] = sys_get_temp_dir().'/Livrable/';
+
     self::$_time = microtime(true);
     self::$_logger=$logger;
     $this->_xsl = new DOMDocument();
@@ -103,8 +110,12 @@ class Livrable_Tei2epub
 
     self::log(E_USER_NOTICE, 'load '. round(microtime(true) - self::$_time, 3)." s.");
     // @xml:id may be used as a href path, example images
-    self::$_pars['bookname'] = $this->_dom->documentElement->getAttributeNS('http://www.w3.org/XML/1998/namespace', 'id');
-    if (!self::$_pars['bookname']) self::$_pars['bookname'] = self::$_pars['filename'];
+    $this->p['xmlid'] = $this->_dom->documentElement->getAttributeNS( 'http://www.w3.org/XML/1998/namespace', 'id' );
+    $this->p['n'] = $this->_dom->documentElement->getAttribute( 'n' );
+    if ( $this->p['filename'] ); // OK
+    else if ( $this->p['n'] ) $this->p['filename'] = $this->p['n'];
+    else if ( $this->p['xmlid'] ) $this->p['filename'] = $this-p['xmlid'];
+    else $this->p['filename'] = "unlivre";
     return $this->_dom;
   }
 
@@ -115,18 +126,15 @@ class Livrable_Tei2epub
   {
     if ( $destfile );
     // if no destfile and srcfile, build aside srcfile
-    else if (isset(self::$_pars['srcdir'])) $destfile=self::$_pars['srcdir'].self::$_pars['filename'].'.epub';
+    else if ( $this->p['srcdir'] && $this->p['filename'] && is_writable( $this->p['srcdir'] ) ) $destfile=$this->p['srcdir'].$this->p['filename'].'.epub';
     // in tmp dir
-    else  if (isset(self::$_pars['filename'])) $destfile=sys_get_temp_dir().'/'.self::$_pars['filename'].'.epub';
-    // a
-    else $destfile = tempnam(null, 'LIV');
+    else  if ( $this->p['filename'] ) $destfile = $this->p['workdir'].$this->p['filename'].'.epub';
     if( !$template ) $template = dirname(__FILE__).'/template-epub/';
     $imagesdir = 'Images/';
     $timeStart = microtime(true);
     if ( !$this->_dom ) $this->load(); // srcdoc may have been modified before (ex: naked version)
-    $destinfo=pathinfo( $destfile );
-    // TOTHINK
-    $destdir=$destinfo['dirname'].'/'.$destinfo['filename'].'-epub/';
+    $destinfo = pathinfo( $destfile );
+    $destdir = $this->p['workdir'].'/'.$destinfo['filename'].'-epub/';
     self::dirclean($destdir);
     // copy the template folder
     self::rcopy($template, $destdir);
@@ -152,15 +160,15 @@ class Livrable_Tei2epub
 
     // copy source Dom to local, before modification by images
     // copy referenced images (received modified doc after copy)
-    $doc=$this->images($this->_dom, $imagesdir, $destdir.'OEBPS/' . $imagesdir);
+    $doc=$this->images( $this->_dom, $imagesdir, $destdir.'OEBPS/' . $imagesdir );
     self::log(E_USER_NOTICE, 'epub, images '. round(microtime(true) - self::$_time, 3)." s.\n");
     // create xhtml pages
     $report = self::transform(
-      dirname(__FILE__) . '/xsl/tei2epub.xsl',
+      dirname(__FILE__).'/xsl/tei2epub.xsl',
       $doc,
       null,
       array(
-        'destdir' => $destdir . 'OEBPS/',
+        'destdir' => $destdir.'OEBPS/',
         '_html' => '.xhtml',
         'opf' => $opf,
       )
@@ -168,48 +176,50 @@ class Livrable_Tei2epub
     // echo $report->saveXML();
     // cover logic, before opf
     $cover=false;
-    if (!isset(self::$_pars['srcdir']) || !isset(self::$_pars['filename']));
-    else if (file_exists(self::$_pars['srcdir'].self::$_pars['filename'].'.png')) $cover=self::$_pars['filename'].'.png';
-    else if (file_exists(self::$_pars['srcdir'].self::$_pars['filename'].'.jpg')) $cover=self::$_pars['filename'].'.jpg';
-    if ($cover) {
-      self::dirclean($destdir.'OEBPS/' . $imagesdir);
-      copy(self::$_pars['srcdir'].$cover, $destdir.'OEBPS/' . $imagesdir . $cover);
+    if ( !$this->p['srcdir'] || !$this->p['filename'] );
+    else if ( file_exists( $this->p['srcdir'].$this->p['filename'].'.png' )) $cover = $this->p['filename'].'.png';
+    else if ( file_exists( $this->p['srcdir'].$this->p['filename'].'.jpg' )) $cover = $this->p['filename'].'.jpg';
+    if ( $cover ) {
+      self::dirclean( $destdir.'OEBPS/' . $imagesdir );
+      copy( $this->p['srcdir'].$cover, $destdir.'OEBPS/'.$imagesdir.$cover);
     }
-    if ($cover) $params['cover'] =  $imagesdir .$cover;
+    if ($cover) $params['cover'] = $imagesdir.$cover;
     // opf file
     self::transform(
-      dirname(__FILE__) . '/xsl/tei2opf.xsl',
+      dirname(__FILE__).'/xsl/tei2opf.xsl',
       $doc,
-      $destdir . 'OEBPS/content.opf',
+      $destdir.'OEBPS/content.opf',
       array(
         '_html' => '.xhtml',
         'opf' => $opf,
-        // 'filename' => self::$_pars['filename'],
+        // 'filename' => $this->p['filename'],
       )
     );
-    self::log(E_USER_NOTICE, 'epub, opf '. round(microtime(true) - self::$_time, 3)." s.");
+    self::log( E_USER_NOTICE, 'epub, opf '. round(microtime(true) - self::$_time, 3)." s." );
     /* ncx not needed in epub3 but useful under firefox epubreader */
     self::transform(
-      dirname(__FILE__) . '/xsl/tei2ncx.xsl',
+      dirname(__FILE__).'/xsl/tei2ncx.xsl',
       $doc,
       $destdir.'OEBPS/toc.ncx',
       array(
         '_html'=>'.xhtml',
         'opf' => $opf,
-        // 'filename' => self::$_pars['filename'],
+        // 'filename' => $this->p['filename'],
       )
     );
-    self::log(E_USER_NOTICE, 'epub, ncx '. round(microtime(true) - self::$_time, 3)." s.");
+    self::log( E_USER_NOTICE, 'epub, ncx '. round(microtime(true) - self::$_time, 3)." s." );
     // because PHP zip do not yet allow store without compression (PHP7)
     // an empty epub is prepared with the mimetype
     copy( dirname(__FILE__).'/mimetype.epub', $destfile );
+
     // zip the dir content
     $dir = dirname( $destfile );
-    if ( !file_exists( $dir ) ) mkdir( $dir, 0775, true );
-    @chmod( $dir, 0775 );  // let @, if www-data is not owner but allowed to write
-
+    if ( !file_exists( $dir ) ) {
+      if ( !@mkdir( $dir, 0775, true ) ) exit( $dir." impossible à créer.\n");
+      @chmod( $dir, 0775 );  // let @, if www-data is not owner but allowed to write
+    }
     self::zip( $destfile, $destdir );
-    if (!self::$debug) { // delete tmp dir if not debug
+    if ( !self::$debug ) { // delete tmp dir if not debug
       self::dirclean( $destdir ); // this is a strange behaviour, new dir will empty dir
       rmdir( $destdir );
     }
@@ -253,10 +263,12 @@ class Livrable_Tei2epub
     // test if relative file path
     if (file_exists($test=dirname($this->_srcfile).'/'.$src)) $src=$test;
     // vendor specific etc/filename.jpg
-    else if (isset(self::$_pars['srcdir']) && file_exists($test=self::$_pars['srcdir'].self::$_pars['filename'].'/'.substr($src, strpos($src, '/')+1))) $src=$test;
+    else if ( $this->p['srcdir']
+      && file_exists( $test = $this->p['srcdir'].$this->p['filename'].'/'.substr($src, strpos($src, '/')+1) )
+    ) $src = $test;
     // if not file exists, escape and alert (?)
-    else if (!file_exists($src)) {
-      $this->log("Image not found: ".$src);
+    else if ( !file_exists( $src ) ) {
+      $this->log( "Image not found: ".$src );
       return;
     }
     $srcParts=pathinfo($src);
@@ -472,7 +484,7 @@ in $kindlegen
     array_shift($_SERVER['argv']); // shift first arg, the script filepath
     $options = "force|mobi";
     if (!count($_SERVER['argv'])) exit("
-    usage    : php -f Tei2epub.php ($options)? destdir/? *.xml
+    usage    : php Tei2epub.php ($options)? destdir/? *.xml
 
     option *   : force, to overwrite all generated epub
     destdir/ ? : optional destination directory, ending by slash
