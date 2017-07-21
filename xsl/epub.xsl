@@ -20,8 +20,7 @@ Epub parameters
       contains(@type, 'article') or 
       contains(@type, 'chapter') or 
       contains(@subtype, 'split') or 
-      contains(@type, 'act')  or 
-      contains(@type, 'poem')
+      contains(@type, 'act') 
     ] 
 | tei:group/tei:text 
 | /tei:TEI/tei:text/tei:*/tei:*[self::tei:argument or self::tei:castList or self::tei:div or self::tei:div1 or self::tei:epilogue or self::tei:group or self::tei:performance or self::tei:prologue or self::tei:set or self::tei:titlePage ][normalize-space(.) != '']
