@@ -200,9 +200,31 @@
   </xsl:template>
   <xsl:template match="tei:back | tei:body | tei:front" mode="ncx">
     <xsl:param name="depth"/>
-    <xsl:variable name="children" select="*[tei:head]"/>
+    <xsl:variable name="children" select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage"/>
     <xsl:choose>
-      <xsl:when test="count($children) &lt; 2"/>
+      <xsl:when test="count($children) &lt; 1"/>
+      <!-- La Vendetta -->
+      <xsl:when test="count($children) = 1">
+        <!-- take the root title if not found in child ? -->
+        <xsl:variable name="title">
+          <xsl:call-template name="title"/>
+        </xsl:variable>
+        <xsl:for-each select="$children">
+          <xsl:choose>
+            <xsl:when test="tei:head">
+              <xsl:call-template name="navPoint">
+                <xsl:with-param name="depth" select="0"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="navPoint">
+                <xsl:with-param name="title" select="$title"/>
+                <xsl:with-param name="depth" select="0"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+      </xsl:when>     
       <!-- div content -->
       <xsl:when test="descendant::*[key('split', generate-id())]">
         <xsl:apply-templates select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage" mode="ncx">

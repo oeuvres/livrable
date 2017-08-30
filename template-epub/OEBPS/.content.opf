@@ -24,7 +24,6 @@ LGPL http://www.gnu.org/licenses/lgpl.html
   <!-- required -->
   <manifest>
     <item href="Styles/epub.css" id="stylesheet" media-type="text/css"/>
-    <item id="obvil_logo" href="Images/obvil_logo.png" media-type="image/png"/>
     <item href="colophon.xhtml" media-type="application/xhtml+xml" id="colophon"/>
   </manifest>
   <!-- required -->

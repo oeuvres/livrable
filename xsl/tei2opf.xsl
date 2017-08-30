@@ -18,8 +18,11 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
   <xsl:param name="format" select="$epub3"/>
   <!-- process an opf template -->
   <xsl:param name="opf"/>
+  
   <!-- The root TEI element -->
   <xsl:variable name="TEI" select="/*"/>
+  
+  
   <!-- process opf template, copy all and sometimes intercept -->
   <xsl:template match="tei:TEI | tei:TEI.2">
     <xsl:apply-templates select="document($opf)/*" mode="opf:template"/>
@@ -88,7 +91,6 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
       <!-- copy style resources -->
       <xsl:apply-templates mode="opf:template"/>
       <!-- @id reconnus par la plupart des bibliothèques epub -->
-      <!-- TODO, cover, do something
       <xsl:if test="$cover != ''">
         <item href="cover{$_html}" id="coverhtml" media-type="application/xhtml+xml"/>
         <xsl:choose>
@@ -100,7 +102,6 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
           </xsl:otherwise>
         </xsl:choose>
       </xsl:if>
-      -->
       <item id="titlePage" media-type="application/xhtml+xml" href="titlePage{$_html}"/>
       <item id="toc" media-type="application/xhtml+xml" href="toc{$_html}" properties="nav"/>
       <xsl:if test="$fnpage != ''">

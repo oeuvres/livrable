@@ -128,6 +128,15 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
                 </xsl:call-template>
               </h1>
               <ol class="tree">
+                <xsl:if test="$cover">
+                  <li>
+                    <a href="cover{$_html}">
+                      <xsl:call-template name="message">
+                        <xsl:with-param name="id">cover</xsl:with-param>
+                      </xsl:call-template>
+                    </a>
+                  </li>
+                </xsl:if>
                 <li>
                   <a href="titlePage{$_html}">
                     <xsl:call-template name="message">

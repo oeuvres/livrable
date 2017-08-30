@@ -162,19 +162,8 @@ class Livrable_Tei2epub
     // copy referenced images (received modified doc after copy)
     $doc=$this->images( $this->_dom, $imagesdir, $destdir.'OEBPS/' . $imagesdir );
     self::log(E_USER_NOTICE, 'epub, images '. round(microtime(true) - self::$_time, 3)." s.\n");
-    // create xhtml pages
-    $report = self::transform(
-      dirname(__FILE__).'/xsl/tei2epub.xsl',
-      $doc,
-      null,
-      array(
-        'destdir' => $destdir.'OEBPS/',
-        '_html' => '.xhtml',
-        'opf' => $opf,
-      )
-    );
-    // echo $report->saveXML();
-    // cover logic, before opf
+    // cover logic, before all generators
+    $params['cover'] = null;
     $cover=false;
     if ( !$this->p['srcdir'] || !$this->p['filename'] );
     else if ( file_exists( $this->p['srcdir'].$this->p['filename'].'.png' )) $cover = $this->p['filename'].'.png';
@@ -184,14 +173,28 @@ class Livrable_Tei2epub
       copy( $this->p['srcdir'].$cover, $destdir.'OEBPS/'.$imagesdir.$cover);
     }
     if ($cover) $params['cover'] = $imagesdir.$cover;
+    $params['_html'] = '.xhtml';
+    // create xhtml pages
+    $report = self::transform(
+      dirname(__FILE__).'/xsl/tei2epub.xsl',
+      $doc,
+      null,
+      array(
+        'destdir' => $destdir.'OEBPS/',
+        '_html' => $params['_html'],
+        'opf' => $opf,
+        "cover" => $params['cover'],
+      )
+    );
     // opf file
     self::transform(
       dirname(__FILE__).'/xsl/tei2opf.xsl',
       $doc,
       $destdir.'OEBPS/content.opf',
       array(
-        '_html' => '.xhtml',
+        '_html' => $params['_html'],
         'opf' => $opf,
+        "cover" => $params['cover'],
         // 'filename' => $this->p['filename'],
       )
     );
@@ -202,8 +205,9 @@ class Livrable_Tei2epub
       $doc,
       $destdir.'OEBPS/toc.ncx',
       array(
-        '_html'=>'.xhtml',
+        '_html'=> $params['_html'],
         'opf' => $opf,
+        "cover" => $params['cover'],
         // 'filename' => $this->p['filename'],
       )
     );

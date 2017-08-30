@@ -19,6 +19,7 @@ Epub parameters
     tei:*[@type][self::tei:div or self::tei:div0 or self::tei:div1 or self::tei:div2 or self::tei:div3][
       contains(@type, 'article') or 
       contains(@type, 'chapter') or 
+      contains(@type, 'dedication') or 
       contains(@subtype, 'split') or 
       contains(@type, 'act') 
     ] 
