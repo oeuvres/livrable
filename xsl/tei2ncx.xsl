@@ -69,7 +69,7 @@
         <navMap>
           <!-- Cover ? -->
           <xsl:choose>
-            <xsl:when test="$cover">
+            <xsl:when test="false() and $cover">
               <navPoint id="cover" playOrder="1">
                 <navLabel>
                   <text>

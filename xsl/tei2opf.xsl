@@ -84,6 +84,9 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
         <xsl:value-of select="$date"/>
         <xsl:text>Z</xsl:text>
       </meta>
+      <xsl:if test="$cover != ''">
+        <meta name="cover" content="cover-image"/>
+      </xsl:if>
     </metadata>
   </xsl:template>
   <xsl:template match="opf:manifest" mode="opf:template">
@@ -134,9 +137,11 @@ http://wiki.mobileread.com/wiki/Adobe_Digital_Editions#Page-map
   </xsl:template>
   <xsl:template match="opf:spine" mode="opf:template">
     <spine toc="ncx">
+      <!-- Not first page in read mode
       <xsl:if test="$cover != ''">
         <itemref idref="coverhtml"/>
       </xsl:if>
+      -->
       <itemref idref="titlePage"/>
       <xsl:apply-templates select="$TEI/*" mode="opf">
         <xsl:with-param name="type">spine</xsl:with-param>

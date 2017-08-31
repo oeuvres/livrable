@@ -52,9 +52,9 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
           <xsl:value-of select="$doctitle"/>
         </xsl:with-param>
         <xsl:with-param name="content">
-          <div id="cover" style="text-align: center; page-break-after: always;">
-            <img src="{$cover}" alt="{$doctitle}" style="height: 100%; max-width: 100%;"/>
-          </div>
+          <section id="cover" epub:type="cover">
+            <img src="{$cover}" alt="{$doctitle}"/>
+          </section>
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
@@ -128,7 +128,7 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
                 </xsl:call-template>
               </h1>
               <ol class="tree">
-                <xsl:if test="$cover">
+                <xsl:if test="false() and $cover">
                   <li>
                     <a href="cover{$_html}">
                       <xsl:call-template name="message">
