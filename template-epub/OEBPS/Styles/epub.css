@@ -152,6 +152,7 @@ h1.collection {text-transform: uppercase;}
 section.div {padding-top: 3em;}
 h1.desc {font-weight: normal; padding: 0; margin: 0; font-size: 117%;} /* <titlePart type="desc"> */
 /* .body > .div {border-bottom: 1px #CCCCCC solid; padding-bottom: 3em; } */
+.titlePart.main{font-size: 150% ; margin-top:1.5em ; margin-bottom:1em;}
 .docAuthor {font-size: 150%; font-variant: small-caps;}
 .docAuthor, .docDate, .docImprint,.performance {text-align: center; margin-left: auto; margin-right: auto; margin-top: 1em; margin-bottom: 1em;}
 .editionStmt {}
