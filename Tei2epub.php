@@ -96,7 +96,8 @@ class Livrable_Tei2epub
       $xml=file_get_contents($this->_srcfile);
       $xml=preg_replace(array('@\r\n@', '@\r@', '@\n[ \t]+@'), array("\n", "\n", "\n"), $xml);
       // $this->doc->recover=true; // no recover, display errors
-      if(!$this->_dom->loadXML($xml, LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NSCLEAN |  LIBXML_COMPACT | LIBXML_PARSEHUGE )) {
+      // LIBXML_PARSEHUGE inconnu en Centos 5.1
+      if(!$this->_dom->loadXML($xml, LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NSCLEAN |  LIBXML_COMPACT  )) {
          self::log("XML error ".$this->_srcfile."\n");
          return false;
       }
