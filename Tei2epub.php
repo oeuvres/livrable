@@ -139,8 +139,9 @@ class Livrable_Tei2epub
     $timeStart = microtime(true);
     if ( !$this->_dom ) $this->load(); // srcdoc may have been modified before (ex: naked version)
     $destinfo = pathinfo( $destfile );
+    // for multi user rights and name collision, a random name ?
     $destdir = $this->p['workdir'].'/'.$destinfo['filename'].'-epub/';
-    self::dirclean($destdir);
+    mkdir($destdir);
     $destdir=str_replace('\\', '/', realpath( $destdir ) . '/'); // absolute path needed for xsl
 
     // copy the template folder
