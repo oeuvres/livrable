@@ -70,8 +70,8 @@ class Livrable_Tei2epub
     // if ( $this->p['srcdir'] && is_writable( $this->p['srcdir'] ) ) $this->p['workdir'] = $this->p['srcdir'];
     $this->p['workdir'] = sys_get_temp_dir().'/Livrable/';
     if ( !file_exists( $this->p['workdir'] ) ) {
-      if ( !@mkdir( $dir, 0777, true ) ) exit( $dir." impossible à créer.\n");
-      @chmod( $dir, 0777 );  // let @, if www-data is not owner but allowed to write
+      if ( !@mkdir( $this->p['workdir'], 0777, true ) ) exit( $dir." impossible à créer.\n");
+      @chmod( $this->p['workdir'], 0777 );  // let @, if www-data is not owner but allowed to write
     }
 
     self::$_time = microtime(true);
