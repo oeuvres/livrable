@@ -69,6 +69,10 @@ class Livrable_Tei2epub
     }
     // if ( $this->p['srcdir'] && is_writable( $this->p['srcdir'] ) ) $this->p['workdir'] = $this->p['srcdir'];
     $this->p['workdir'] = sys_get_temp_dir().'/Livrable/';
+    if ( !file_exists( $this->p['workdir'] ) ) {
+      if ( !@mkdir( $dir, 0777, true ) ) exit( $dir." impossible à créer.\n");
+      @chmod( $dir, 0777 );  // let @, if www-data is not owner but allowed to write
+    }
 
     self::$_time = microtime(true);
     self::$_logger=$logger;
@@ -137,6 +141,8 @@ class Livrable_Tei2epub
     $destinfo = pathinfo( $destfile );
     $destdir = $this->p['workdir'].'/'.$destinfo['filename'].'-epub/';
     self::dirclean($destdir);
+    $destdir=str_replace('\\', '/', realpath( $destdir ) . '/'); // absolute path needed for xsl
+
     // copy the template folder
     self::rcopy($template, $destdir);
     // check if there is a colophon where to write a date
@@ -157,7 +163,6 @@ class Livrable_Tei2epub
     $opf =  $template . 'OEBPS/.content.opf';
     if (file_exists($f = $template . 'OEBPS/content.opf')) $opf = $f;
     $opf = str_replace('\\', '/', realpath($opf));
-    $destdir=str_replace('\\', '/', realpath($destdir) . '/'); // absolute path needed for xsl
 
     // copy source Dom to local, before modification by images
     // copy referenced images (received modified doc after copy)

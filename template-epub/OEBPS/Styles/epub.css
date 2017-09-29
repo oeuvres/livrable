@@ -21,7 +21,7 @@ http://wiki.mobileread.com/wiki/CSS_HowTo
 /*
 @font-face { font-family: 'small-caps'; font-style: normal; src: url(AlegreyaSansSC-Regular.ttf); }
 */
-* { 
+* {
  }
 html { height:100% }
 body { height:100% }
@@ -33,7 +33,7 @@ article, aside, details, figcaption, figure, footer, header, main, nav, section,
 html,body { margin: 0; padding: 0; border: 0; } /* height: 100% => page break in ADE */
 @page { margin-left: 2ex; margin-right: 1ex; margin-top: 2ex; margin-bottom: 0; }
 blockquote { margin: 1rem 0 1rem 0rem; text-align: justify; }
-h3, h4 { margin-left: 1.5em; text-indent: -1.5em; padding-left: 1.5em; text-align: left; margin-left: 1.5rem; text-indent: -1.5rem; padding-left: 1.5rem; }
+h3, h4 { margin-left: 1.5em; text-indent: -1.5em; text-align: left; margin-left: 1.5rem; text-indent: -1.5rem; }
 ul, ol { padding-left: 1.5em; margin-left: 0; padding-left: 1.5rem; }
 li { padding-left: 0; margin-left: 0; }
 .dialogue li { text-indent: 0.5em; text-indent: 0.5rem; }
@@ -81,7 +81,7 @@ figure img { padding: 6px; }
 figure a { text-decoration: none; border-bottom: none; }
 figure a:hover { text-decoration: none; border-bottom: none; }
 form label { padding: 0; line-height: 100%; }
-h1, h2, h3, h4, h5, h6 { text-indent: 0; line-height: 110%; clear: both; -webkit-hyphens: none; adobe-hyphenate: none; -moz-hyphens: none; hyphens: none; page-break-after: avoid; page-break-inside: avoid; orphans: 0; }
+h1, h2, h3, h4, h5, h6 { line-height: 110%; clear: both; -webkit-hyphens: none; adobe-hyphenate: none; -moz-hyphens: none; hyphens: none; page-break-after: avoid; page-break-inside: avoid; orphans: 0; }
 h1 { text-align: center; margin-left: auto; margin-right: auto; font-size: 1.5em; font-weight: normal; margin-top: 2em; margin-bottom: 1em; padding-top: 1em; margin-top: 0; }
 h1 a, h1 a:link, h1 a:visited, h2 a, h2 a:link, h2 a:visited, h3 a, h3 a:link, h3 a:visited { color: inherit; text-decoration: none; border-bottom-color: transparent; }
 h1 small { font-weight: normal; font-size: 85%; opacity: 1; letter-spacing: normal; font-variant: normal; text-shadow: none; }
