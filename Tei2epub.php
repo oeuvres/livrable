@@ -221,7 +221,7 @@ class Livrable_Tei2epub
     self::log( E_USER_NOTICE, 'epub, ncx '. round(microtime(true) - self::$_time, 3)." s." );
     // because PHP zip do not yet allow store without compression (PHP7)
     // an empty epub is prepared with the mimetype
-    copy( dirname(__FILE__).'/mimetype.epub', $destfile );
+    copy( realpath(dirname(__FILE__)).'/mimetype.epub', $destfile );
 
     // zip the dir content
     $dir = dirname( $destfile );

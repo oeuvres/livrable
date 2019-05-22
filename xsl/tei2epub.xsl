@@ -12,10 +12,16 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
 <p> : no @class, but @align
 -->
 <xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.1" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns="http://www.w3.org/1999/xhtml" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xmlns:opf="http://www.idpf.org/2007/opf" exclude-result-prefixes="epub html tei opf" extension-element-prefixes="">
-  <xsl:import href="../../Teinte/tei2html.xsl"/>
+  <!-- Use import to allow overriding -->
+  <xsl:include href="../../Teinte/xsl/flow.xsl"/>
+  <xsl:include href="../../Teinte/xsl/notes.xsl"/>
+  <xsl:include href="../../Teinte/xsl/teiHeader.xsl"/>
+  <xsl:include href="../../Teinte/xsl/toc.xsl"/>
   <!-- ensure override on common -->
   <xsl:include href="epub.xsl"/>
   <xsl:output indent="yes" method="xml" encoding="UTF-8"/>
+  <!-- Name of this xsl  -->
+  <xsl:param name="this">tei2epub.xsl</xsl:param>
   <!-- output type modify behavior of tei_html.xsl -->
   <xsl:param name="format" select="$epub3"/>
   <!-- directory where to generate file, set by caller -->
@@ -24,8 +30,6 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
   <xsl:param name="opf"/>
   <!-- Output some infos for debug -->
   <xsl:param name="debug"/>
-  <!-- name of this xsl (for some tests, when overridind) -->
-  <xsl:variable name="this">tei2epub.xsl</xsl:variable>
   <xsl:template match="/">
     <report>
       <xsl:apply-templates select="/*/tei:text" mode="epub"/>
