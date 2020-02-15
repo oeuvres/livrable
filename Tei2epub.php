@@ -467,7 +467,7 @@ class Livrable_Tei2epub
       exit("
 To obtain mobi format, you should install the kindlegen program from Amazon
 https://www.amazon.com/gp/feature.html?docId=1000765211
-in $kindlegen
+in ".dirname(__FILE__)."
       ");
     }
     $cmd = $kindlegen." ".$epubfile;
