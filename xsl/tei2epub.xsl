@@ -25,7 +25,7 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
   <!-- output type modify behavior of tei_html.xsl -->
   <xsl:param name="format" select="$epub3"/>
   <!-- directory where to generate file, set by caller -->
-  <xsl:param name="destdir"/>
+  <xsl:param name="dstdir"/>
   <!-- link to the opf file to get the css links -->
   <xsl:param name="opf"/>
   <!-- Output some infos for debug -->
@@ -340,7 +340,7 @@ param id allow to override the default mecanism for file name
   <xsl:template name="document">
     <xsl:param name="id"/>
     <xsl:param name="href">
-      <xsl:value-of select="$destdir"/>
+      <xsl:value-of select="$dstdir"/>
       <xsl:choose>
         <xsl:when test="$id != ''">
           <xsl:value-of select="$id"/>

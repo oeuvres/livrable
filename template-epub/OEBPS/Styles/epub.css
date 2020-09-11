@@ -23,10 +23,9 @@ http://wiki.mobileread.com/wiki/CSS_HowTo
 */
 * {
  }
-html { height:100% }
-body { height:100% }
+body { background: #FFFFFF;}
 body { font-family: Georgia, Amasis, Malabar, serif; -moz-hyphens: auto; -webkit-hyphens: auto; adobe-hyphenate: auto; hyphens: auto; }
-.argument, li.bibl, .cb, figure, .fileDesc > .editionStmt, .fileDesc > .publicationStmt, .fileDesc > .sourceDesc, .figure, .footnotes, menu, .menu, div.note, a.note, a.noteref, a.noteback, .pb, small, .speaker, .stage, table, li.witness { font-family: GothicMB101, Gothic, sans-serif; } /* Kobo: sans-serif italic pb */
+.argument, li.bibl, .cb, figure, .fileDesc > .editionStmt, .fileDesc > .publicationStmt, .fileDesc > .sourceDesc, .figure, .footnotes, menu, .menu, div.note, a.note, a.noteref, a.noteback, .pb, small, .speaker, .stage, table, li.witness {  } /* Kobo: sans-serif italic pb */
 article, aside, details, figcaption, figure, footer, header, main, nav, section, summary { display: block; }
 .dedication { font-style: italic; }
 /** alignments, em values as fallback if no rem support */

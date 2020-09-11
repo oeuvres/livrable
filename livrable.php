@@ -127,27 +127,27 @@ class Livrable_Tei2epub
   /**
    * Generate an epub from a TEI file
    */
-  public function epub( $destfile=null, $template=null )
+  public function epub( $dstfile=null, $template=null )
   {
-    if ( $destfile );
-    // if no destfile and srcfile, build aside srcfile
-    else if ( $this->p['srcdir'] && $this->p['filename'] && is_writable( $this->p['srcdir'] ) ) $destfile=$this->p['srcdir'].$this->p['filename'].'.epub';
+    if ( $dstfile );
+    // if no dstfile and srcfile, build aside srcfile
+    else if ( $this->p['srcdir'] && $this->p['filename'] && is_writable( $this->p['srcdir'] ) ) $dstfile=$this->p['srcdir'].$this->p['filename'].'.epub';
     // in tmp dir
-    else  if ( $this->p['filename'] ) $destfile = $this->p['workdir'].$this->p['filename'].'.epub';
+    else  if ( $this->p['filename'] ) $dstfile = $this->p['workdir'].$this->p['filename'].'.epub';
     if( !$template ) $template = dirname(__FILE__).'/template-epub/';
     $imagesdir = 'Images/';
     $timeStart = microtime(true);
     if ( !$this->_dom ) $this->load(); // srcdoc may have been modified before (ex: naked version)
-    $destinfo = pathinfo( $destfile );
+    $dstinfo = pathinfo( $dstfile );
     // for multi user rights and name collision, a random name ?
-    $destdir = $this->p['workdir'].'/'.$destinfo['filename'].'-epub/';
-    mkdir($destdir);
-    $destdir=str_replace('\\', '/', realpath( $destdir ) . '/'); // absolute path needed for xsl
+    $dstdir = $this->p['workdir'].'/'.$dstinfo['filename'].'-epub/';
+    self::dirclean($dstdir); // create a clean directory
+    $dstdir=str_replace('\\', '/', realpath( $dstdir ) . '/'); // absolute path needed for xsl
 
     // copy the template folder
-    self::rcopy($template, $destdir);
+    self::rcopy($template, $dstdir);
     // check if there is a colophon where to write a date
-    if (file_exists($f = $destdir.'OEBPS/colophon.xhtml')) {
+    if (file_exists($f = $dstdir.'OEBPS/colophon.xhtml')) {
       $cont = file_get_contents($f);
       /*
       $xpath = $this->xpath();
@@ -167,7 +167,7 @@ class Livrable_Tei2epub
 
     // copy source Dom to local, before modification by images
     // copy referenced images (received modified doc after copy)
-    $doc=$this->images( $this->_dom, $imagesdir, $destdir.'OEBPS/' . $imagesdir );
+    $doc=$this->images( $this->_dom, $imagesdir, $dstdir.'OEBPS/' . $imagesdir );
     self::log(E_USER_NOTICE, 'epub, images '. round(microtime(true) - self::$_time, 3)." s.\n");
     // cover logic, before all generators
     $params['cover'] = null;
@@ -176,8 +176,8 @@ class Livrable_Tei2epub
     else if ( file_exists( $this->p['srcdir'].$this->p['filename'].'.png' )) $cover = $this->p['filename'].'.png';
     else if ( file_exists( $this->p['srcdir'].$this->p['filename'].'.jpg' )) $cover = $this->p['filename'].'.jpg';
     if ( $cover ) {
-      self::dirclean( $destdir.'OEBPS/' . $imagesdir );
-      copy( $this->p['srcdir'].$cover, $destdir.'OEBPS/'.$imagesdir.$cover);
+      self::dirclean( $dstdir.'OEBPS/' . $imagesdir );
+      copy( $this->p['srcdir'].$cover, $dstdir.'OEBPS/'.$imagesdir.$cover);
     }
     if ($cover) $params['cover'] = $imagesdir.$cover;
     $params['_html'] = '.xhtml';
@@ -187,7 +187,7 @@ class Livrable_Tei2epub
       $doc,
       null,
       array(
-        'destdir' => $destdir.'OEBPS/',
+        'dstdir' => $dstdir.'OEBPS/',
         '_html' => $params['_html'],
         'opf' => $opf,
         "cover" => $params['cover'],
@@ -197,7 +197,7 @@ class Livrable_Tei2epub
     self::transform(
       dirname(__FILE__).'/xsl/tei2opf.xsl',
       $doc,
-      $destdir.'OEBPS/content.opf',
+      $dstdir.'OEBPS/content.opf',
       array(
         '_html' => $params['_html'],
         'opf' => $opf,
@@ -210,7 +210,7 @@ class Livrable_Tei2epub
     self::transform(
       dirname(__FILE__).'/xsl/tei2ncx.xsl',
       $doc,
-      $destdir.'OEBPS/toc.ncx',
+      $dstdir.'OEBPS/toc.ncx',
       array(
         '_html'=> $params['_html'],
         'opf' => $opf,
@@ -221,42 +221,42 @@ class Livrable_Tei2epub
     self::log( E_USER_NOTICE, 'epub, ncx '. round(microtime(true) - self::$_time, 3)." s." );
     // because PHP zip do not yet allow store without compression (PHP7)
     // an empty epub is prepared with the mimetype
-    copy( realpath(dirname(__FILE__)).'/mimetype.epub', $destfile );
+    copy( realpath(dirname(__FILE__)).'/mimetype.epub', $dstfile );
 
     // zip the dir content
-    $dir = dirname( $destfile );
+    $dir = dirname( $dstfile );
     if ( !file_exists( $dir ) ) {
       if ( !@mkdir( $dir, 0775, true ) ) exit( $dir." impossible à créer.\n");
       @chmod( $dir, 0775 );  // let @, if www-data is not owner but allowed to write
     }
-    self::zip( $destfile, $destdir );
+    self::zip( $dstfile, $dstdir );
     if ( !self::$debug ) { // delete tmp dir if not debug
-      self::dirclean( $destdir ); // this is a strange behaviour, new dir will empty dir
-      rmdir( $destdir );
+      self::dirclean( $dstdir ); // this is a strange behaviour, new dir will empty dir
+      rmdir( $dstdir );
     }
     // shall we return entire content of the file ?
-    return $destfile;
+    return $dstfile;
   }
   /**
-   * Extract <graphic> elements from a DOM doc, copy images in a flat destdir
+   * Extract <graphic> elements from a DOM doc, copy images in a flat dstdir
    * $soc : a TEI dom doc, retruned with modified image links
    * $href : a href prefix to redirest generated links
-   * $destdir : a folder if images should be copied
+   * $dstdir : a folder if images should be copied
    * return : a doc with updated links to image
    */
-  public function images( $doc, $href=null, $destdir=null )
+  public function images( $doc, $href=null, $dstdir=null )
   {
-    if ($destdir) $destdir=rtrim($destdir, '/\\').'/';
+    if ($dstdir) $dstdir=rtrim($dstdir, '/\\').'/';
     // copy linked images in an images folder, and modify relative link
     // take $doc by reference
     $doc=$doc->cloneNode(true);
     foreach ($doc->getElementsByTagNameNS('http://www.tei-c.org/ns/1.0', 'graphic') as $el) {
-      $this->img($el->getAttributeNode("url"), $href, $destdir);
+      $this->img($el->getAttributeNode("url"), $href, $dstdir);
     }
     /*
     do not store images of pages, especially in tif
     foreach ($doc->getElementsByTagNameNS('http://www.tei-c.org/ns/1.0', 'pb') as $el) {
-      $this->img($el->getAttributeNode("facs"), $hrefTei, $destdir, $hrefSqlite);
+      $this->img($el->getAttributeNode("facs"), $hrefTei, $dstdir, $hrefSqlite);
     }
     */
     return $doc;
@@ -264,7 +264,7 @@ class Livrable_Tei2epub
   /**
    * Process one image
    */
-  public function img( $att, $hrefdir="", $destdir=null )
+  public function img( $att, $hrefdir="", $dstdir=null )
   {
     if (!isset($att) || !$att || !$att->value) return;
     $src=$att->value;
@@ -284,17 +284,17 @@ class Livrable_Tei2epub
     }
     $srcParts=pathinfo($src);
     // test first if dst dir (example, epub for sqlite)
-    if (isset($destdir)) {
+    if (isset($dstdir)) {
       // create images folder only if images detected
-      if (!file_exists($destdir)) self::dirclean($destdir);
+      if (!file_exists($dstdir)) self::dirclean($dstdir);
       // destination
       $i=2;
       // avoid duplicated files
-      while (file_exists($destdir.$srcParts['basename'])) {
+      while (file_exists($dstdir.$srcParts['basename'])) {
         $srcParts['basename']=$srcParts['filename'].'-'.$i.'.'.$srcParts['extension'];
         $i++;
       }
-      copy( $src, $destdir.$srcParts['basename']);
+      copy( $src, $dstdir.$srcParts['basename']);
     }
     // changes links in TEI so that straight transform will point on the right files
     $att->value=$hrefdir.$srcParts['basename'];
@@ -401,24 +401,24 @@ class Livrable_Tei2epub
    * Recursively copy files from one directory to another
    *
    * @param String $src - Source of files being moved
-   * @param String $dest - Destination of files being moved
+   * @param String $dst - Destination of files being moved
    */
-  static function rcopy( $src, $dest )
+  static function rcopy( $src, $dst )
   {
       // If source is not a directory stop processing
       if(!is_dir($src)) return false;
       // If the destination directory does not exist create it
-      if(!is_dir($dest)) {
+      if(!is_dir($dst)) {
         // If the destination directory could not be created stop processing
-        if(!mkdir($dest)) return false;
+        if(!mkdir($dst)) return false;
       }
       // Open the source directory to read in files
       $it = new DirectoryIterator($src);
       foreach($it as $f) {
           if($f->isFile()) {
-              copy($f->getRealPath(), "$dest/" . $f->getFilename());
+              copy($f->getRealPath(), "$dst/" . $f->getFilename());
           } else if(!$f->isDot() && $f->isDir()) {
-              self::rcopy($f->getRealPath(), "$dest/$f");
+              self::rcopy($f->getRealPath(), "$dst/$f");
           }
       }
   }
@@ -495,10 +495,10 @@ in ".dirname(__FILE__)."
     array_shift($_SERVER['argv']); // shift first arg, the script filepath
     $options = "force|mobi";
     if (!count($_SERVER['argv'])) exit("
-    usage    : php Tei2epub.php ($options)? destdir/? *.xml
+    usage    : php Tei2epub.php ($options)? dstdir/? *.xml
 
     option *   : force, to overwrite all generated epub
-    destdir/ ? : optional destination directory, ending by slash
+    dstdir/ ? : optional destination directory, ending by slash
     *.xml      : glob patterns are allowed, with or without quotes
 
 ");
@@ -510,10 +510,10 @@ in ".dirname(__FILE__)."
 
     $lastc = substr($_SERVER['argv'][0], -1);
     if ('/' == $lastc || '\\' == $lastc) {
-      $destdir = array_shift($_SERVER['argv']);
-      $destdir = rtrim($destdir, '/\\').'/';
-      if (!file_exists($destdir)) {
-        mkdir($destdir, 0775, true);
+      $dstdir = array_shift($_SERVER['argv']);
+      $dstdir = rtrim($dstdir, '/\\').'/';
+      if (!file_exists($dstdir)) {
+        mkdir($dstdir, 0775, true);
         @chmod($dir, 0775);  // let @, if www-data is not owner but allowed to write
       }
     }
@@ -523,19 +523,19 @@ in ".dirname(__FILE__)."
     foreach ($_SERVER['argv'] as $glob) {
       foreach(glob($glob) as $srcfile) {
         $count++;
-        if (isset($destdir) ) $destfile = $destdir.pathinfo($srcfile,  PATHINFO_FILENAME).$ext;
-        else $destfile=dirname($srcfile).'/'.pathinfo($srcfile,  PATHINFO_FILENAME).$ext;
+        if (isset($dstdir) ) $dstfile = $dstdir.pathinfo($srcfile,  PATHINFO_FILENAME).$ext;
+        else $dstfile = pathinfo($srcfile,  PATHINFO_FILENAME).$ext;
         if (isset($opt['force'])); // overwrite
-        else if (!file_exists($destfile)); // do not exist
-        else if (filemtime($srcfile) <= filemtime($destfile)) continue; // epub is newer
-        fwrite(STDERR, "$count. $srcfile > $destfile\n");
+        else if (!file_exists($dstfile)); // do not exist
+        else if (filemtime($srcfile) <= filemtime($dstfile)) continue; // epub is newer
+        fwrite(STDERR, "$count. $srcfile > $dstfile\n");
         // work
         if(isset($opt['mobi'])) {
-          self::mobi($srcfile, $destfile);
+          self::mobi($srcfile, $dstfile);
         }
         else {
           $livre = new Livrable_Tei2epub( $srcfile, STDERR );
-          $livre->epub( $destfile );
+          $livre->epub( $dstfile );
         }
       }
     }
