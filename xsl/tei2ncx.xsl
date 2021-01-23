@@ -200,9 +200,10 @@
   </xsl:template>
   <xsl:template match="tei:back | tei:body | tei:front" mode="ncx">
     <xsl:param name="depth"/>
-    <xsl:variable name="children" select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage"/>
+    <xsl:variable name="children" select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage[normalize-space(.) != '']"/>
     <xsl:choose>
       <xsl:when test="count($children) &lt; 1"/>
+      <xsl:when test="normalize-space(.) = ''"/>
       <!-- La Vendetta -->
       <xsl:when test="count($children) = 1">
         <!-- take the root title if not found in child ? -->
@@ -227,7 +228,7 @@
       </xsl:when>     
       <!-- div content -->
       <xsl:when test="descendant::*[key('split', generate-id())]">
-        <xsl:apply-templates select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage" mode="ncx">
+        <xsl:apply-templates select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage[normalize-space(.) != '']" mode="ncx">
           <xsl:with-param name="depth" select="$depth - 1"/>
         </xsl:apply-templates>
       </xsl:when>

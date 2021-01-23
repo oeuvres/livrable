@@ -78,7 +78,7 @@ https://kdp.amazon.com/self-publishing/help?topicId=A1JPUWCSD6F59O
       <xsl:with-param name="content">
         <xsl:variable name="html">
           <xsl:choose>
-            <xsl:when test="tei:front/tei:titlePage">
+            <xsl:when test="tei:front/tei:titlePage[normalize-space(.) != '']">
               <xsl:apply-templates select="tei:front/tei:titlePage"/>
             </xsl:when>
             <xsl:otherwise>
