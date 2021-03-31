@@ -495,7 +495,7 @@ in ".dirname(__FILE__)."
     array_shift($_SERVER['argv']); // shift first arg, the script filepath
     $options = "force|mobi";
     if (!count($_SERVER['argv'])) exit("
-    usage    : php Tei2epub.php ($options)? dstdir/? *.xml
+    usage    : php livrable.php ($options)? dstdir/? *.xml
 
     option *   : force, to overwrite all generated epub
     dstdir/ ? : optional destination directory, ending by slash
