@@ -24,7 +24,8 @@ Epub parameters
       contains(@type, 'dedication') or 
       contains(@subtype, 'split') or 
       contains(@type, 'act') 
-    ] 
+    ]
+| /tei:TEI/tei:text/tei:body[not(tei:div)][not(tei:div1)]
 | tei:group/tei:text 
 | /tei:TEI/tei:text/tei:*/tei:*[self::tei:argument or self::tei:castList or self::tei:div or self::tei:div1 or self::tei:epilogue or self::tei:group or self::tei:performance or self::tei:prologue or self::tei:set or self::tei:titlePage ][normalize-space(.) != '']
   " use="generate-id(.)"/>

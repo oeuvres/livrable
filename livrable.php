@@ -17,10 +17,10 @@ else date_default_timezone_set("Europe/Paris");
 
 if (realpath($_SERVER['SCRIPT_FILENAME']) != realpath(__FILE__)); // file is include do nothing
 else if (php_sapi_name() == "cli") {
-  Livrable_Tei2epub::cli();
+  Livrable::cli();
 }
 
-class Livrable_Tei2epub
+class Livrable
 {
   /** Static parameters, used for example to communicate between XSL tests and calls */
   public $p=array(
@@ -55,7 +55,7 @@ class Livrable_Tei2epub
   /**
    * Constructor, initialize what is needed
    */
-  public function __construct( $srcfile, $logger=null, $pars=array() )
+  public function __construct($srcfile, $logger=null, $pars=array())
   {
     if ( !is_array($pars) ) $pars=array();
     $this->p = array_merge( $this->p, $pars);
@@ -111,7 +111,7 @@ class Livrable_Tei2epub
     $this->_dom->formatOutput = true;
     if ($this->_srcfile) $this->_dom->documentURI = realpath($this->_srcfile);
     // should resolve xinclude
-    $this->_dom->xinclude(LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NSCLEAN );
+    $this->_dom->xinclude(LIBXML_NOENT | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_NSCLEAN | LIBXML_PARSEHUGE); // 
 
     self::log(E_USER_NOTICE, 'load '. round(microtime(true) - self::$_time, 3)." s.");
     // @xml:id may be used as a href path, example images
@@ -127,7 +127,7 @@ class Livrable_Tei2epub
   /**
    * Generate an epub from a TEI file
    */
-  public function epub( $dstfile=null, $template=null )
+  public function epub($dstfile=null, $template=null)
   {
     if ( $dstfile );
     // if no dstfile and srcfile, build aside srcfile
@@ -138,6 +138,8 @@ class Livrable_Tei2epub
     $imagesdir = 'Images/';
     $timeStart = microtime(true);
     if ( !$this->_dom ) $this->load(); // srcdoc may have been modified before (ex: naked version)
+    // loading problem
+    if ( !$this->_dom ) return false;
     $dstinfo = pathinfo( $dstfile );
     // for multi user rights and name collision, a random name ?
     $dstdir = $this->p['workdir'].'/'.$dstinfo['filename'].'-epub/';
@@ -244,7 +246,7 @@ class Livrable_Tei2epub
    * $dstdir : a folder if images should be copied
    * return : a doc with updated links to image
    */
-  public function images( $doc, $href=null, $dstdir=null )
+  public function images($doc, $href=null, $dstdir=null)
   {
     if ($dstdir) $dstdir=rtrim($dstdir, '/\\').'/';
     // copy linked images in an images folder, and modify relative link
@@ -264,7 +266,7 @@ class Livrable_Tei2epub
   /**
    * Process one image
    */
-  public function img( $att, $hrefdir="", $dstdir=null )
+  public function img($att, $hrefdir="", $dstdir=null)
   {
     if (!isset($att) || !$att || !$att->value) return;
     $src=$att->value;
@@ -316,7 +318,7 @@ class Livrable_Tei2epub
   /**
    * Transform a doc with the provided xslt
    */
-  public function transform( $xsl, $doc=null, $dst=null, $pars=array() )
+  public function transform($xsl, $doc=null, $dst=null, $pars=array())
   {
     if (!is_array($pars)) $pars=array();
     if (!isset($pars['debug'])) $pars['debug'] = self::$debug;
@@ -355,7 +357,7 @@ class Livrable_Tei2epub
    * Especially used for xsl:message coming from transform()
    * To avoid Apache time limit, php could output some bytes during long transformations
    */
-  static function log( $errno, $errstr=null, $errfile=null, $errline=null, $errcontext=null )
+  static function log($errno, $errstr=null, $errfile=null, $errline=null, $errcontext=null)
   {
     $errstr=preg_replace("/XSLTProcessor::transform[^:]*:/", "", $errstr, -1, $count);
     if ($count) { // is an XSLT error or an XSLT message, reformat here
@@ -373,7 +375,7 @@ class Livrable_Tei2epub
   /**
    * Delete all files in a directory, create it if not exist
    */
-  static public function dirclean( $dir, $depth=0 )
+  static public function dirclean($dir, $depth=0)
   {
     if (is_file($dir)) return unlink($dir);
     // attempt to create the folder we want empty
@@ -403,7 +405,7 @@ class Livrable_Tei2epub
    * @param String $src - Source of files being moved
    * @param String $dst - Destination of files being moved
    */
-  static function rcopy( $src, $dst )
+  static function rcopy($src, $dst)
   {
       // If source is not a directory stop processing
       if(!is_dir($src)) return false;
@@ -425,7 +427,7 @@ class Livrable_Tei2epub
   /**
    * Zip folder to a zip file
    */
-  static public function zip( $zipfile, $srcdir )
+  static public function zip($zipfile, $srcdir)
   {
     $zip = new ZipArchive;
     if(!file_exists($zipfile)) $zip->open($zipfile, ZIPARCHIVE::CREATE);
@@ -459,7 +461,7 @@ class Livrable_Tei2epub
   /**
    * Transform an epub file in mobi with the kindlegen program
    */
-  public static function mobi( $epubfile, $mobifile )
+  public static function mobi($epubfile, $mobifile)
   {
     $kindlegen = dirname(__FILE__)."/kindlegen";
     if (!file_exists($kindlegen)) $kindlegen = dirname(__FILE__)."/kindlegen.exe";
@@ -478,12 +480,12 @@ in ".dirname(__FILE__)."
       self::log(E_USER_ERROR, "\n".$status."\n".join("\n", $output)."\n".$last."\n");
       return;
     }
-    // create directories if neessary
+    // create directories if necessary
     if (!is_dir(dirname($mobifile))) {
       mkdir(dirname($mobifile), 0775, true);
       @chmod(dirname($mobifile), 0775);
     }
-    rename( $tmpfile, $mobifile);
+    rename($tmpfile, $mobifile);
   }
 
   /**
@@ -534,7 +536,7 @@ in ".dirname(__FILE__)."
           self::mobi($srcfile, $dstfile);
         }
         else {
-          $livre = new Livrable_Tei2epub( $srcfile, STDERR );
+          $livre = new Livrable( $srcfile, STDERR );
           $livre->epub( $dstfile );
         }
       }

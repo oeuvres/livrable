@@ -202,6 +202,9 @@
     <xsl:param name="depth"/>
     <xsl:variable name="children" select="tei:argument  | tei:div | tei:div0 | tei:div1 |  tei:castList | tei:epilogue | tei:performance | tei:prologue | tei:set | tei:titlePage[normalize-space(.) != '']"/>
     <xsl:choose>
+      <xsl:when test="count($children) &lt; 1 and self::tei:body">
+        <xsl:call-template name="navPoint"/>
+      </xsl:when>
       <xsl:when test="count($children) &lt; 1"/>
       <xsl:when test="normalize-space(.) = ''"/>
       <!-- La Vendetta -->
